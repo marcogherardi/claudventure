@@ -14,6 +14,7 @@ import shutil
 import subprocess
 import sys
 import tempfile
+import textwrap
 from pathlib import Path
 from typing import List, Optional, Tuple
 
@@ -29,6 +30,7 @@ MAX_ROUNDS = 3        # command batches Claude may send per player message
 MAX_COMMANDS = 8      # commands per player message
 
 RESET, DIM, CYAN, BOLD, YELLOW = "\033[0m", "\033[2m", "\033[36m", "\033[1m", "\033[33m"
+GREEN = "\033[32m"
 
 HELP = """Type what you want to do, in your own words, or ask the narrator anything.
   /undo          take back your last action
@@ -522,10 +524,13 @@ class Session:
         if st["dark"]:
             self.out.line("It is too dark to see.", DIM)
             return
-        text = "Exits: " + (", ".join(st["exits"]) or "none")
+        self.out.line("Exits: " + (", ".join(st["exits"]) or "none"), DIM)
         if st["items_here"]:
-            text += ".  You see: " + " · ".join(st["items_here"])
-        self.out.line(text, DIM)
+            self.out.line("You see:", DIM)
+            for item in st["items_here"]:
+                wrapped = textwrap.fill(" ".join(item.split()), width=self.out.width,
+                                        initial_indent="   ", subsequent_indent="     ")
+                print(f"{GREEN}{wrapped}{RESET}")
 
     def event(self, kind: str, turn: Turn, note: str):
         parts = [f'<event type="{kind}">{note}</event>']
