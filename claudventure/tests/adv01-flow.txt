@@ -1,0 +1,12 @@
+# Undo / save / load / death / game over (run with --seed 3)
+go east
+go south
+/save test
+go east
+climb down into the hole
+go down
+/undo
+/saves
+/load test
+/new
+/quit

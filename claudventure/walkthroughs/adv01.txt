@@ -1,0 +1,175 @@
+# Adventureland - complete solution (13 treasures). Verified with
+#   python3 claudventure/walkthrough.py games/adv01.dat claudventure/walkthroughs/adv01.txt
+# Lines starting with '#' are notes. Random hazards (chiggers in the swamp,
+# bees, mud drying up) can change things; see the notes.
+# Lines starting with '?' are only needed in some cases (harmless otherwise).
+
+# Blue ox: the magic word BUNYON (written on the axe) sends axe and ox to the grove
+E
+E
+GET AXE
+N
+SAY BUNYON
+# Swimming out of the bog only works carrying nothing
+SWIM
+W
+S
+# Mud protects from chiggers and bees (but wakes the dragon!).
+# It dries up and falls back into the swamp unless you also carry water.
+GET MUD
+W
+GET AXE
+GET OX
+GET FRUIT
+E
+CLIMB TREE
+# Never take the spider web (deadly). Take the keys BEFORE chopping the tree
+GET KEYS
+D
+CHOP TREE
+GO STUMP
+# The stump is the treasure room
+DROP OX
+DROP FRUIT
+GET LAMP
+# Rub the lamp exactly twice (ring, bracelet); a third time is deadly
+RUB LAMP
+RUB LAMP
+D
+GET RUBIES
+U
+DROP RUBIES
+DROP AXE
+GET BOTTLE
+# Flint & steel is needed to light anything, the lamp included
+U
+? GET MUD
+E
+GO HOLE
+GET FLINT
+U
+W
+GO STUMP
+D
+GO HOLE
+UNLOCK DOOR
+DROP KEYS
+LIGHT LAMP
+GO HALL
+D
+N
+N
+# Honey is safe to take while carrying mud
+GET HONEY
+S
+S
+S
+GET BLADDER
+N
+U
+U
+U
+U
+DROP HONEY
+U
+GET GAS
+GO STUMP
+# Keep the mud in the stump: handy, and far from the dragon
+DROP MUD
+D
+GO HOLE
+GO HALL
+D
+S
+U
+# Drop the gas bladder first: lighting it in your hands kills you
+DROP BLADDER
+LIGHT GAS
+GO HOLE
+# Never jump carrying the bricks
+JUMP
+# Scaring the bear keeps the honey (feeding him loses a treasure)
+SCREAM
+GET MIRROR
+GO THRONE
+GET CROWN
+W
+JUMP
+W
+GET BRICKS
+D
+N
+D
+N
+W
+N
+D
+DAM LAVA
+DROP BRICKS
+DROP WATER
+GET FIRESTONE
+# No room for everything: the bottle and the net wait here
+DROP BOTTLE
+U
+GET RUG
+SAY AWAY
+S
+GO STUMP
+# If the chiggers bit you in the swamp, the mud cures the bites
+? GET MUD
+? DROP MUD
+DROP CROWN
+DROP FIRESTONE
+# The mirror only survives being dropped onto the rug
+DROP RUG
+DROP MIRROR
+GET RUG
+# The lamp stays lit from now on, so the flint is no longer needed
+DROP FLINT
+# With the rug, AWAY takes you to the maze (and from the maze to the meadow)
+SAY AWAY
+D
+GET NET
+GET BOTTLE
+U
+SAY AWAY
+E
+# The fish escapes without the net and dies without water
+GET WATER
+GET FISH
+W
+S
+GO STUMP
+DROP FISH
+DROP NET
+DROP RUG
+# Getting the mud also cures chigger bites
+GET MUD
+D
+GO HOLE
+GO HALL
+D
+N
+N
+# Empty the bottle only now: while you carry water the mud cannot dry up
+DRINK WATER
+GET BEES
+# Air holes keep the bees alive
+MAKE HOLE
+S
+S
+U
+U
+U
+U
+# Mud near the dragon wakes it: leave it in the stump
+? DROP MUD
+U
+N
+# Free bees can sting (8% a turn): be quick
+DROP BEES
+GET EGGS
+S
+GO STUMP
+DROP EGGS
+SCORE

@@ -20,6 +20,8 @@
 #include <curses.h>
 #include <stdarg.h>
 #include <signal.h>
+#include <unistd.h>
+#include <time.h>
 
 #include "Scott.h"
 
@@ -100,6 +102,131 @@ int BottomHeight;	/* Height of bottom window */
 
 long BitFlags=0;	/* Might be >32 flags - I haven't seen >32 yet */
 
+/*
+ *	Headless mode (-j): no curses, plain stdin/stdout for driving the
+ *	game from another program. Room descriptions are wrapped in
+ *	\002 ... \003 and, every time input is wanted, a line made of
+ *	\036 followed by a JSON snapshot of the game state is written.
+ *	Input lines starting with '#' are driver commands:
+ *	#save <file>, #load <file>, #look, #state.
+ */
+int Headless=0;
+int TurnCount=0;
+int UnknownWord=0;
+
+void SaveGameTo(char *name);
+void LoadGame(char *name);
+void Look();
+
+static void JsonStr(char *s)
+{
+	putchar('"');
+	for(;*s;s++)
+	{
+		unsigned char c=*s;
+		if(c=='"'||c=='\\')
+			printf("\\%c",c);
+		else if(c=='\n')
+			printf("\\n");
+		else if(c<' ')
+			printf("\\u%04x",c);
+		else
+			putchar(c);
+	}
+	putchar('"');
+}
+
+static void JsonItemList(int where)
+{
+	int ct,f=0;
+	putchar('[');
+	for(ct=0;ct<=GameHeader.NumItems;ct++)
+	{
+		if(Items[ct].Location==where)
+		{
+			if(f++)
+				putchar(',');
+			JsonStr(Items[ct].Text);
+		}
+	}
+	putchar(']');
+}
+
+void EmitState(int gameover)
+{
+	static char *ExitNames[6]=
+	{
+		"North","South","East","West","Up","Down"
+	};
+	Room *r=&Rooms[MyLoc];
+	int ct,f,stored=0;
+	int lit=Items[LIGHT_SOURCE].Location==CARRIED||
+		Items[LIGHT_SOURCE].Location==MyLoc;
+	int dark=(BitFlags&(1<<DARKBIT)) && !lit;
+	for(ct=0;ct<=GameHeader.NumItems;ct++)
+		if(Items[ct].Location==GameHeader.TreasureRoom &&
+		   *Items[ct].Text=='*')
+			stored++;
+	printf("\n\036{\"turn\":%d,\"room\":%d,\"room_text\":",
+		TurnCount,MyLoc);
+	JsonStr(r->Text);
+	printf(",\"dark\":%s,\"exits\":[",dark?"true":"false");
+	for(ct=0,f=0;ct<6;ct++)
+		if(r->Exits[ct]!=0)
+		{
+			if(f++)
+				putchar(',');
+			printf("\"%s\"",ExitNames[ct]);
+		}
+	printf("],\"items_here\":");
+	JsonItemList(MyLoc);
+	printf(",\"inventory\":");
+	JsonItemList(CARRIED);
+	printf(",\"item_locations\":[");
+	for(ct=0;ct<=GameHeader.NumItems;ct++)
+		printf("%s%d",ct?",":"",
+			Items[ct].Location==CARRIED?-1:Items[ct].Location);
+	printf("],\"light_time\":%d,\"lamp_lit\":%s",GameHeader.LightTime,
+		Items[LIGHT_SOURCE].Location!=DESTROYED?"true":"false");
+	printf(",\"treasures_stored\":%d,\"treasures_total\":%d",
+		stored,GameHeader.Treasures);
+	printf(",\"flags\":[");
+	for(ct=0,f=0;ct<32;ct++)
+		if(BitFlags&(1L<<ct))
+			printf("%s%d",f++?",":"",ct);
+	printf("],\"counter\":%d,\"unknown_word\":%s,\"game_over\":%s}\n",
+		CurrentCounter,UnknownWord?"true":"false",
+		gameover?"true":"false");
+	UnknownWord=0;
+	fflush(stdout);
+}
+
+/* Game over or death outside the action table: tidy up and leave */
+void Finish(int pause)
+{
+	if(Headless)
+	{
+		EmitState(1);
+		exit(0);
+	}
+	wrefresh(Bottom);
+	sleep(pause);
+	endwin();
+	exit(0);
+}
+
+/* Room window output: curses top window, or stdout when headless */
+void TopPrint(char *fmt, ...)
+{
+	va_list ap;
+	va_start(ap,fmt);
+	if(Headless)
+		vprintf(fmt,ap);
+	else
+		vw_printw(Top,fmt,ap);
+	va_end(ap);
+}
+
 void Fatal(char *x)
 {
 	if(DisplayUp)
@@ -115,6 +242,8 @@ void Aborted()
 
 void ClearScreen(void)
 {
+	if(Headless)
+		return;
 	werase(Bottom);
 	wrefresh(Bottom);
 }
@@ -356,6 +485,8 @@ int OutputPos=0;
 void OutReset()
 {
 	OutputPos=0;
+	if(Headless)
+		return;
 	wmove(Bottom,BottomHeight-1,0);
 	wclrtoeol(Bottom);
 }
@@ -364,6 +495,11 @@ void OutBuf(char *buffer)
 {
 	char word[80];
 	int wp;
+	if(Headless)
+	{
+		fputs(buffer,stdout);
+		return;
+	}
 	while(*buffer)
 	{
 		if(OutputPos==0)
@@ -443,33 +579,41 @@ void Look()
 	int ct,f;
 	int pos;
 	
-	werase(Top);
-	wmove(Top,0,0);	/* Needed by some curses variants */
+	if(Headless)
+		TopPrint("\002");
+	else
+	{
+		werase(Top);
+		wmove(Top,0,0);	/* Needed by some curses variants */
+	}
 	if((BitFlags&(1<<DARKBIT)) && Items[LIGHT_SOURCE].Location!= CARRIED
 	            && Items[LIGHT_SOURCE].Location!= MyLoc)
 	{
 		if(Options&YOUARE)
-			wprintw(Top,"You can't see. It is too dark!\n");
+			TopPrint("You can't see. It is too dark!\n");
 		else
-			wprintw(Top,"I can't see. It is too dark!\n");
+			TopPrint("I can't see. It is too dark!\n");
 		if (Options & TRS80_STYLE)
-			wprintw(Top,TRS80_LINE);
-		wrefresh(Top);
+			TopPrint(TRS80_LINE);
+		if(Headless)
+			TopPrint("\003");
+		else
+			wrefresh(Top);
 		return;
 	}
 	r=&Rooms[MyLoc];
 	if(*r->Text=='*')
-		wprintw(Top,"%s\n",r->Text+1);
+		TopPrint("%s\n",r->Text+1);
 	else
 	{
 		if(Options&YOUARE)
-			wprintw(Top,"You are %s\n",r->Text);
+			TopPrint("You are %s\n",r->Text);
 		else
-			wprintw(Top,"I'm in a %s\n",r->Text);
+			TopPrint("I'm in a %s\n",r->Text);
 	}
 	ct=0;
 	f=0;
-	wprintw(Top,"\nObvious exits: ");
+	TopPrint("\nObvious exits: ");
 	while(ct<6)
 	{
 		if(r->Exits[ct]!=0)
@@ -477,14 +621,14 @@ void Look()
 			if(f==0)
 				f=1;
 			else
-				wprintw(Top,", ");
-			wprintw(Top,"%s",ExitNames[ct]);
+				TopPrint(", ");
+			TopPrint("%s",ExitNames[ct]);
 		}
 		ct++;
 	}
 	if(f==0)
-		wprintw(Top,"none");
-	wprintw(Top,".\n");
+		TopPrint("none");
+	TopPrint(".\n");
 	ct=0;
 	f=0;
 	pos=0;
@@ -495,36 +639,39 @@ void Look()
 			if(f==0)
 			{
 				if(Options&YOUARE)
-					wprintw(Top,"\nYou can also see: ");
+					TopPrint("\nYou can also see: ");
 				else
-					wprintw(Top,"\nI can also see: ");
+					TopPrint("\nI can also see: ");
 				pos=16;
 				f++;
 			}
 			else if (!(Options & TRS80_STYLE))
 			{
-				wprintw(Top," - ");
+				TopPrint(" - ");
 				pos+=3;
 			}
 			if(pos+strlen(Items[ct].Text)>(Width-10))
 			{
 				pos=0;
-				wprintw(Top,"\n");
+				TopPrint("\n");
 			}
-			wprintw(Top,"%s",Items[ct].Text);
+			TopPrint("%s",Items[ct].Text);
 			pos += strlen(Items[ct].Text);
 			if (Options & TRS80_STYLE)
 			{
-				wprintw(Top,". ");
+				TopPrint(". ");
 				pos+=2;
 			}
 		}
 		ct++;
 	}
-	wprintw(Top,"\n");
+	TopPrint("\n");
 	if (Options & TRS80_STYLE)
-		wprintw(Top,TRS80_LINE);
-	wrefresh(Top);
+		TopPrint(TRS80_LINE);
+	if(Headless)
+		TopPrint("\003");
+	else
+		wrefresh(Top);
 }
 
 int WhichWord(char *word, char **list)
@@ -552,6 +699,17 @@ void LineInput(char *buf)
 {
 	int pos=0;
 	int ch;
+	if(Headless)
+	{
+		char *p;
+		fflush(stdout);
+		if(fgets(buf,256,stdin)==NULL)
+			exit(0);
+		for(p=buf;*p;p++)
+			if(*p=='\n'||*p=='\r'||(unsigned char)*p<' ')
+				*p=(*p=='\t')?' ':0;
+		return;
+	}
 	while(1)
 	{
 		wrefresh(Bottom);
@@ -605,13 +763,38 @@ int *vb,*no;
 	{
 		do
 		{
-			Output("\nTell me what to do ? ");
-			wrefresh(Bottom);
-			LineInput(buf);
+			if(Headless)
+			{
+				EmitState(0);
+				LineInput(buf);
+				if(*buf=='#')
+				{
+					char arg[256];
+					*arg=0;
+					sscanf(buf+1,"%*s %255s",arg);
+					if(strncmp(buf+1,"save",4)==0)
+						SaveGameTo(arg);
+					else if(strncmp(buf+1,"load",4)==0)
+					{
+						LoadGame(arg);
+						Look();
+					}
+					else if(strncmp(buf+1,"look",4)==0)
+						Look();
+					num=0;
+					continue;
+				}
+			}
+			else
+			{
+				Output("\nTell me what to do ? ");
+				wrefresh(Bottom);
+				LineInput(buf);
+			}
 			OutReset();
 			num=sscanf(buf,"%9s %9s",verb,noun);
 		}
-		while(num==0||*buf=='\n');
+		while(num<=0||*buf=='\n');
 		if(num==1)
 			*noun=0;
 		if(*noun==0 && strlen(verb)==1)
@@ -644,6 +827,7 @@ int *vb,*no;
 		if(vc==-1)
 		{
 			Output("You use word(s) I don't know! ");
+			UnknownWord=1;
 		}
 	}
 	while(vc==-1);
@@ -653,11 +837,21 @@ int *vb,*no;
 void SaveGame()
 {
 	char buf[256];
-	int ct;
-	FILE *f;
+	if(Headless)
+	{
+		Output("(Saving is handled by the front end.)\n");
+		return;
+	}
 	Output("Filename: ");
 	LineInput(buf);
 	Output("\n");
+	SaveGameTo(buf);
+}
+
+void SaveGameTo(char *buf)
+{
+	int ct;
+	FILE *f;
 	f=fopen(buf,"w");
 	if(f==NULL)
 	{
@@ -684,14 +878,14 @@ void LoadGame(char *name)
 	short DarkFlag;
 	if(f==NULL)
 	{
-		Output("Unable to restore game.");
+		Output("Unable to restore game.\n");
 		return;
 	}
 	for(ct=0;ct<16;ct++)
 	{
 		fscanf(f,"%d %d\n",&Counters[ct],&RoomSaved[ct]);
 	}
-	fscanf(f,"%ld %d %hd %d %d %hd\n",
+	fscanf(f,"%ld %hd %hd %d %d %hd\n",
 		&BitFlags,&DarkFlag,&MyLoc,&CurrentCounter,&SavedRoom,
 		&GameHeader.LightTime);
 	/* Backward compatibility */
@@ -889,10 +1083,7 @@ int PerformLine(int ct)
 			}
 			case 63:
 doneit:				Output("The game is now over.\n");
-				wrefresh(Bottom);
-				sleep(5);
-				endwin();
-				exit(0);
+				Finish(5);
 			case 64:
 				Look();
 				break;
@@ -1067,6 +1258,8 @@ doneit:				Output("The game is now over.\n");
 				break;
 			}
 			case 88:
+				if(Headless)
+					break;
 				wrefresh(Top);
 				wrefresh(Bottom);
 				sleep(2);	/* DOC's say 2 seconds. Spectrum times at 1.5 */
@@ -1122,10 +1315,7 @@ int PerformActions(int vb,int no)
 				Output("You fell down and broke your neck. ");
 			else
 				Output("I fell down and broke my neck. ");
-			wrefresh(Bottom);
-			sleep(5);
-			endwin();
-			exit(0);
+			Finish(5);
 		}
 		if(Options&YOUARE)
 			Output("You can't go in that direction. ");
@@ -1162,7 +1352,7 @@ int PerformActions(int vb,int no)
 					if(f2==2)
 						doagain=1;
 					if(vb!=0 && doagain==0)
-						return;
+						return(0);
 				}
 			}
 		}
@@ -1296,7 +1486,7 @@ int PerformActions(int vb,int no)
 	return(fl);
 }
 	
-void main(int argc, char *argv[])
+int main(int argc, char *argv[])
 {
 	FILE *f;
 	int vb,no;
@@ -1325,9 +1515,12 @@ void main(int argc, char *argv[])
 			case 'p':
 				Options|=PREHISTORIC_LAMP;
 				break;
+			case 'j':
+				Headless=1;
+				break;
 			case 'h':
 			default:
-				fprintf(stderr,"%s: [-h] [-y] [-s] [-i] [-t] [-d] [-p] <gamename> [savedgame].\n",
+				fprintf(stderr,"%s: [-h] [-y] [-s] [-i] [-t] [-d] [-p] [-j] <gamename> [savedgame].\n",
 						argv[0]);
 				exit(1);
 		}
@@ -1369,19 +1562,22 @@ void main(int argc, char *argv[])
 		BottomHeight = 14;
 	}
 
-	DisplayUp=1;
-	initscr();
-	Top=newwin(TopHeight,Width,0,0);
-	Bottom=newwin(BottomHeight,Width,TopHeight,0);
-	scrollok(Bottom,TRUE);
-	leaveok(Top,TRUE);
-	leaveok(Bottom,FALSE);
-	idlok(Bottom,TRUE);
-	noecho();
-	cbreak();
-	wmove(Bottom,BottomHeight-1,0);
+	if(!Headless)
+	{
+		DisplayUp=1;
+		initscr();
+		Top=newwin(TopHeight,Width,0,0);
+		Bottom=newwin(BottomHeight,Width,TopHeight,0);
+		scrollok(Bottom,TRUE);
+		leaveok(Top,TRUE);
+		leaveok(Bottom,FALSE);
+		idlok(Bottom,TRUE);
+		noecho();
+		cbreak();
+		wmove(Bottom,BottomHeight-1,0);
+	}
 	OutReset();
-	OutBuf("\
+	if(!Headless) OutBuf("\
 Scott Free, A Scott Adams game driver in C.\n\
 Release 1.14, (c) 1993,1994,1995 Swansea University Computer Society.\n\
 Distributed under the GNU software license\n\n");
@@ -1389,7 +1585,10 @@ Distributed under the GNU software license\n\n");
 	fclose(f);
 	if(argc==3)
 		LoadGame(argv[2]);
-	srand(time(NULL)^getpid()^getuid());
+	if(getenv("SCOTTFREE_SEED"))
+		srand(atoi(getenv("SCOTTFREE_SEED")));
+	else
+		srand(time(NULL)^getpid()^getuid());
 	Look();
 	while(1)
 	{
@@ -1405,6 +1604,7 @@ Distributed under the GNU software license\n\n");
 			Redraw=0;
 		}
 		GetInput(&vb,&no);
+		TurnCount++;
 		switch(PerformActions(vb,no))
 		{
 			case -1:Output("I don't understand your command. ");

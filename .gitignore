@@ -1,0 +1,15 @@
+# The game files are copyrighted by Scott Adams: get them separately (see games/README.md)
+games/*
+!games/README.md
+
+# Build output (make -C src)
+src/ScottCurses
+src/*.o
+src/*.orig
+
+# Created at run time
+saves/
+logs/
+__pycache__/
+*.pyc
+.DS_Store

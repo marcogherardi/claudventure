@@ -1,0 +1,18 @@
+# Test inputs for the narrator (run: ./claudventure.sh --seed 3 --script claudventure/tests/adv01-inputs.txt)
+what am I supposed to do in this game?
+climb up one of the trees
+what can I see from up here?
+get down and head east twice
+grab the axe
+what's written on it?
+pick up the fish too
+I want to chuck the axe into the water
+i
+xyzzy
+dance a little jig
+say the magic word written on the axe
+how do I save my game?
+go north
+I'm stuck, any hint?
+still stuck, another hint please
+swim
