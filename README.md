@@ -7,15 +7,49 @@ The original games understand exactly two words, `VERB NOUN`, of which only the 
 The engine stays the only authority on what happens in the game. Claude does not decide outcomes.
 
 ```
-Claudventure · Adventureland  (/help for commands)
+╭─ Claudventure · Adventureland ─────────────────────────────────╮╭─ Level 0 (where you started) ──────────╮
+│                                                                ││ [1 ]───[2 ]───<3 >                     │
+│ You stand in a forest, thick with trees pressing in on every   ││                                        │
+│ side. Paths seem to lead off in all four directions, though    ││ 1 forest                               │
+│ the woods look much the same whichever way you turn. You       ││ 2 sunny meadow                         │
+│ carry nothing.                                                 ││ 3 shore of a lake                      │
+│                                                                ││                                        │
+│ > e                                                            ││                                        │
+│                                                                ││                                        │
+│ You step east out of the trees into a sunny meadow. A huge     ││                                        │
+│ dragon lies sleeping in the grass, utterly still. Nearby       ││                                        │
+│ stands a sign reading "In many cases mud is good. In           ││                                        │
+│ others..." The rest of the message trails off.                 ││                                        │
+│                                                                ││                                        │
+│ > e                                                            ││                                        │
+│                                                                │╰────────────────────────────────────────╯
+│ You leave the dragon snoring behind and come out on the        │╭─ shore of a lake ──────────────────────╮
+│ shore of a lake. The water laps quietly at the edge, and a     ││ Exits: North, South, West              │
+│ golden fish glints just beneath the surface. A rusty axe       ││ Water                                  │
+│ lies on the ground, with the magic word "BUNYON" marked on     ││ *GOLDEN FISH*                          │
+│ it. A sign warns: "No swimming allowed here."                  ││ Sign says "No swimming allowed here"   │
+│                                                                │╰────────────────────────────────────────╯
+│ > get axe                                                      │╭─ Carrying 1/6 ─────────────────────────╮
+│                                                                ││ Rusty axe (Magic word "BUNYON" on it)  │
+│ You pick up the rusty axe. Its blade is pitted with age, and   │╰────────────────────────────────────────╯
+│ the word "BUNYON" is still plainly marked on it.               │╭─ Score ────────────────────────────────╮
+│                                                                ││ Treasures 0/13 · Turn 3 · No light     │
+╰────────────────────────────────────────────────────────────────╯╰────────────────────────────────────────╯
+╭──────────────────────────────────────────────────────────────────────────────────────────────────────────╮
+│  What do you want to do?  (/help for commands)                                                           │
+╰──────────────────────────────────────────────────────────────────────────────────────────────────────────╯
+ tok 2.9k + 88.7k cache · 5h 26% · 7d 26%   /help · map · PgUp/PgDn scroll · Ctrl+Q quit
+```
 
-[shore of a lake · 0/13]
+*(A real session in the full-screen interface: the story on the left; on the right the map of the current level, what is here, what you carry and the score.)*
+
+Claude translates whatever you write, and answers when you talk to it rather than to the game:
+
+```
 > I want to chuck the axe into the water
 You hurl the axe at the water, but nothing happens, and the axe lands on the shore
 beside you. Meanwhile the fish slips away from you: "Fish have escaped back to the
 lake." The *GOLDEN FISH* is lying on the shore again, and your hands are empty.
-Exits: North, South, West.  You see: Water · *GOLDEN FISH* · Rusty axe (Magic word
-"BUNYON" on it) · Sign says "No swimming allowed here"
 
 > dance a little jig
 The game has no verb for dancing. The closest ones it knows are JUMP, which makes you
@@ -25,7 +59,6 @@ want to jump, just say so and I'll send it.
 > go north
 You wade north into a quick-sand bog. The ground sucks at your feet, and no way out
 is visible. A *Small statue of a BLUE OX* sits here in the muck.
-Exits: none.  You see: *Small statue of a BLUE OX*
 
 > I'm stuck, any hint?
 Gentle nudge: no exits are listed, but the game knows a few verbs that describe
@@ -33,9 +66,11 @@ moving through water or muck. Think about what you've seen on the shore you just
 from, and about how heavy you are right now.
 ```
 
-*(From a real session, lightly trimmed. In the terminal, out-of-game answers such as hints and help appear in a different colour.)*
+*(From a real session, lightly trimmed. Out-of-game answers such as hints and help appear in a different colour.)*
 
 ## Features
+
+- **Full-screen interface.** The story scrolls on the left (PgUp/PgDn), while panels on the right always show the map of the level you are on, the exits and items here, your inventory and the score. Input has a history (Up/Down). `--plain` gives the classic scrolling text instead.
 
 - **Natural language in, original game underneath.** "Take the axe and go north" becomes `GET AXE` followed by `NORTH`. "Pick up", "grab" and "take" all become `GET`. Compound sentences are split into several commands.
 - **The right verb, every time.** Claude checks every command against the game's own vocabulary before it is sent. A word the parser does not know is never sent and never costs a turn. Claude tells you which verbs the game understands instead.
@@ -88,14 +123,15 @@ from, and about how heavy you are right now.
 ## Requirements
 
 - macOS or Linux, with a C compiler and curses (`gcc`, `ncurses`)
-- Python 3.9 or newer (standard library only)
+- Python 3.9 or newer, plus [Textual](https://textual.textualize.io/) for the full-screen interface (`--plain` needs nothing beyond the standard library)
 - [Claude Code](https://claude.com/claude-code), installed and logged in. Developed with version 2.1.
 
 ## Getting started
 
 ```sh
 git clone https://github.com/marcogherardi/claudventure.git && cd claudventure
-make -C src            # builds src/ScottCurses
+make -C src                               # builds src/ScottCurses
+python3 -m pip install -r requirements.txt  # Textual, for the full-screen interface
 ```
 
 The game files are not included, because the games are still copyrighted by Scott Adams (see [Credits](#credits-and-licences)). Get the *Scott Adams Collection* in ScottFree / TRS-80 `.dat` format, for example from the [Interactive Fiction Archive](https://www.ifarchive.org/indexes/if-archive/scott-adams/), and put the `.dat` files in `games/` (see [games/README.md](games/README.md)).
@@ -107,6 +143,7 @@ The game files are not included, because the games are still copyrighted by Scot
 ./claudventure.sh --load autosave   # pick up where you left off
 ./claudventure.sh --model haiku     # faster and lighter, less accurate
 ./claudventure.sh --always-interpret  # let Claude interpret even plain commands like 'n'
+./claudventure.sh --plain           # scrolling text instead of the panels
 ./play.sh                           # the original game, no AI
 ```
 
@@ -117,6 +154,7 @@ The game files are not included, because the games are still copyrighted by Scot
 | `/new` | start over |
 | `map` or `/map` | map of the places you have visited |
 | `/usage` | tokens, estimated cost, subscription quota |
+| PgUp / PgDn, Up / Down, Ctrl+Q | scroll the story, recall earlier input, quit (full-screen mode) |
 | `/quit` | leave (the game is saved as `autosave`) |
 
 A valid one- or two-word game command (`e`, `get axe`) goes straight to the game and Claude narrates the result. Anything else goes to the narrator, whether it is an action ("light the lamp and go down"), a question ("what was written on that sign?") or a cry for help ("I'm stuck").
@@ -160,7 +198,8 @@ python3 claudventure/walkthrough.py games/adv02.dat claudventure/walkthroughs/ad
 claudventure.sh             launcher
 play.sh                     the original game in curses, no AI
 claudventure/
-  app.py                    terminal app: Claude session, command checking, undo, saves, usage
+  app.py                    the game session (Claude, command checking, undo, saves, usage) and --plain mode
+  tui.py                    full-screen interface (Textual)
   automap.py                ASCII map of the visited places
   engine.py                 drives the headless engine over pipes
   scott.py                  .dat reader and game-guide generator (python3 claudventure/scott.py guide games/adv01.dat)

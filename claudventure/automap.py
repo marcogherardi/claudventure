@@ -116,9 +116,8 @@ class AutoMap:
 
     # drawing ---------------------------------------------------------------------
 
-    def render(self, current: int, width: int = 86) -> str:
-        if not self.order:
-            return "You have not been anywhere yet."
+    def _draw(self, current: int):
+        """Grid drawings of every level: ([(z, title, lines)], drawn exits, positions, numbers)."""
         pos = self._layout()
         num = {room: i + 1 for i, room in enumerate(self.order)}
         nw = len(str(len(self.order)))
@@ -133,7 +132,7 @@ class AutoMap:
             return at.get((x + dx, y + dy, z + dz))
 
         drawn = set()   # (room, direction): exits shown on the map as a line or level mark
-        out: List[str] = []
+        drawings = []
         levels = sorted({p[2] for p in pos.values()}, reverse=True)
         for z in levels:
             rooms = [r for r in self.order if pos[r][2] == z]
@@ -169,10 +168,21 @@ class AutoMap:
                         grid[y * 2 + 1][x * CELL + 1 + (nw - 1) // 2] = "│"
             title = "Level 0 (where you started)" if z == 0 else f"Level {z:+d}" + (
                 " (up)" if z > 0 else " (down)")
-            out.append(title)
-            out.extend("  " + "".join(row).rstrip() for row in grid if "".join(row).strip())
-            out.append("")
+            drawings.append((z, title, ["".join(row).rstrip() for row in grid
+                                        if "".join(row).strip()]))
+        return drawings, drawn, pos, num
 
+    def render(self, current: int, width: int = 86) -> str:
+        """The whole map: every level, then the list of places."""
+        if not self.order:
+            return "You have not been anywhere yet."
+        drawings, drawn, pos, num = self._draw(current)
+        nw = len(str(len(self.order)))
+        out: List[str] = []
+        for _, title, lines in drawings:
+            out.append(title)
+            out.extend("  " + line for line in lines)
+            out.append("")
         out.append("Places (you are at <" + str(num.get(current, "?")) + ">;"
                    " ^ v ↕ = a way up / down):")
         for r in self.order:
@@ -205,6 +215,25 @@ class AutoMap:
             out.append("")
             out.append("(Items are as you last saw them.)")
         return "\n".join(out)
+
+
+    def level_view(self, current: int, width: int, height: int) -> Tuple[str, List[str]]:
+        """The level the player is on, cropped around them, plus the names of its places."""
+        if current not in self.seen:
+            return "Map", []
+        drawings, _, pos, num = self._draw(current)
+        z = pos[current][2]
+        title, lines = next((t, l) for zz, t, l in drawings if zz == z)
+        names = [f"{num[r]} {scott.place_name(self.game.rooms[r].text, 22) if self.seen[r] else '(dark)'}"
+                 for r in self.order if pos[r][2] == z]
+        room_rows = max(1, height - min(len(names), height // 2))
+        row = next(i for i, l in enumerate(lines) if "<" in l)
+        col = lines[row].index("<")
+        top = max(0, min(row - room_rows // 2, len(lines) - room_rows))
+        left = max(0, min(col - width // 2, max(len(l) for l in lines) - width))
+        view = [l[left:left + width] for l in lines[top:top + room_rows]]
+        legend = [_clip(n, width) for n in names][:max(0, height - len(view) - 1)]
+        return title, view + ([""] + legend if legend else [])
 
 
 def _clip(line: str, width: int) -> str:

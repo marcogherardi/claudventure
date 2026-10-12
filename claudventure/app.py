@@ -42,7 +42,8 @@ Plain game commands (n, e, i, get axe, climb tree...) go straight to the game; C
   /new           start over
   /map           map of the places you have visited (also just: map)
   /usage         tokens used and subscription quota
-  /quit          leave (the game is saved as 'autosave')"""
+  /quit          leave (the game is saved as 'autosave')
+Full screen: PgUp/PgDn scroll the story, Up/Down recall what you typed, Ctrl+Q quits."""
 
 
 # --- Claude ------------------------------------------------------------------
@@ -270,6 +271,29 @@ class Printer:
         self.write(text + "\n")
         self.end()
 
+    def footer(self, st: dict):
+        """Exits and visible items under the narration."""
+        if st.get("game_over"):
+            return
+        if st["dark"]:
+            self.line("It is too dark to see.", DIM)
+            return
+        self.line("Exits: " + (", ".join(st["exits"]) or "none"), DIM)
+        if st["items_here"]:
+            self.line("You see:", DIM)
+            for item in st["items_here"]:
+                wrapped = textwrap.fill(" ".join(item.split()), width=self.width,
+                                        initial_indent="   ", subsequent_indent="     ")
+                print(f"{GREEN}{wrapped}{RESET}")
+
+    def show_map(self, text: str):
+        self.end()
+        for line in text.split("\n"):
+            if line.startswith("Level "):
+                print(f"{BOLD}{line}{RESET}")
+            else:
+                print(re.sub(r"(<[^>]*>)", f"{YELLOW}{BOLD}\\1{RESET}", line, count=1))
+
 
 class ReplyParser:
     """Splits Claude's streamed reply into visible text, asides and <cmd> tags."""
@@ -342,12 +366,15 @@ class ReplyParser:
 # --- game session -----------------------------------------------------------------
 
 class Session:
-    def __init__(self, args):
+    """The game: engine, Claude, undo, saves and map. Output goes through `out`
+    (a Printer for --plain, or the panel interface in tui.py)."""
+
+    def __init__(self, args, out=None):
         self.args = args
         self.game_path = GAMES / f"{args.game}.dat"
         self.game = scott.load(self.game_path)
         self.death_room = len(self.game.rooms) - 1
-        self.out = Printer()
+        self.out = out or Printer()
         self.saves = SAVES / args.game
         self.saves.mkdir(parents=True, exist_ok=True)
         LOGS.mkdir(exist_ok=True)
@@ -565,19 +592,7 @@ class Session:
             self.footer()
 
     def footer(self):
-        st = self.engine.state
-        if st.get("game_over"):
-            return
-        if st["dark"]:
-            self.out.line("It is too dark to see.", DIM)
-            return
-        self.out.line("Exits: " + (", ".join(st["exits"]) or "none"), DIM)
-        if st["items_here"]:
-            self.out.line("You see:", DIM)
-            for item in st["items_here"]:
-                wrapped = textwrap.fill(" ".join(item.split()), width=self.out.width,
-                                        initial_indent="   ", subsequent_indent="     ")
-                print(f"{GREEN}{wrapped}{RESET}")
+        self.out.footer(self.engine.state)
 
     def event(self, kind: str, turn: Turn, note: str):
         self.map.observe(turn.state)
@@ -654,13 +669,7 @@ class Session:
             return AutoMap(self.game)  # an older save without a map: start a new one
 
     def show_map(self):
-        text = self.map.render(self.engine.state.get("room", -1), self.out.width)
-        self.out.end()
-        for line in text.split("\n"):
-            if line.startswith("Level "):
-                print(f"{BOLD}{line}{RESET}")
-            else:
-                print(re.sub(r"(<[^>]*>)", f"{YELLOW}{BOLD}\\1{RESET}", line, count=1))
+        self.out.show_map(self.map.render(self.engine.state.get("room", -1), self.out.width))
 
     def list_saves(self):
         names = sorted(p.stem for p in self.saves.glob("*.sav"))
@@ -742,6 +751,8 @@ def main():
     ap.add_argument("--script", metavar="FILE", help="read player input from a file (testing)")
     ap.add_argument("--always-interpret", action="store_true",
                     help="let Claude interpret every input, even plain game commands like 'n' or 'get axe'")
+    ap.add_argument("--plain", action="store_true",
+                    help="scrolling text instead of the full-screen panels")
     ap.add_argument("--list", action="store_true", help="list the available games")
     args = ap.parse_args()
 
@@ -752,7 +763,18 @@ def main():
     if args.game not in games:
         print(f"Unknown game '{args.game}'. Available: {', '.join(games)}")
         return 1
+    if not (args.plain or args.script):
+        try:
+            import tui
+        except ImportError:
+            print("The full-screen interface needs Textual: python3 -m pip install textual\n"
+                  "(or use --plain). Starting in plain mode.\n")
+        else:
+            return tui.run(args)
+    return run_plain(args)
 
+
+def run_plain(args) -> int:
     script = None
     if args.script:
         script = [l.rstrip("\n") for l in open(args.script) if l.strip() and not l.startswith("#")]
