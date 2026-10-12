@@ -185,6 +185,16 @@ def short_room(text: str) -> str:
     return t if len(t) <= 48 else t[:45] + "..."
 
 
+def place_name(text: str, maxlen: int = 40) -> str:
+    """Short name of a room for the player: 'I'm on the shore of a lake' -> 'shore of a lake'."""
+    t = text[1:] if text.startswith("*") else text
+    t = " ".join(t.split("\n")[0].split())
+    t = re.sub(r"^(I'm |I am |You're |You are )(in |on |at )?(an? |the )?", "", t).rstrip(".")
+    if len(t) > maxlen:
+        t = t[:maxlen].rsplit(" ", 1)[0] + "…"
+    return t
+
+
 def room_display(text: str) -> str:
     """Room text as Look() prints it in 'I am' mode."""
     return text[1:] if text.startswith("*") else f"I'm in a {text}"

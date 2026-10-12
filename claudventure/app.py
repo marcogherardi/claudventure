@@ -19,6 +19,7 @@ from pathlib import Path
 from typing import List, Optional, Tuple
 
 import scott
+from automap import AutoMap
 from engine import ROOT, Engine, Turn
 
 HERE = Path(__file__).resolve().parent
@@ -39,6 +40,7 @@ Plain game commands (n, e, i, get axe, climb tree...) go straight to the game; C
   /load [name]   load a saved game
   /saves         list saved games
   /new           start over
+  /map           map of the places you have visited (also just: map)
   /usage         tokens used and subscription quota
   /quit          leave (the game is saved as 'autosave')"""
 
@@ -357,6 +359,7 @@ class Session:
         self.prompt_file = self._write_system_prompt()
         self.claude: Optional[Claude] = None
         self.usage = Usage()  # survives /new, which restarts Claude
+        self.map = AutoMap(self.game)
 
     # system prompt -------------------------------------------------------------
 
@@ -482,6 +485,7 @@ class Session:
         for i, cmd in enumerate(cmds):
             before = self.engine.state.get("room")
             t = self.engine.send(cmd)
+            self.map.observe(t.state, cmd, before)
             self.log("engine", f"> {cmd}\n{t.text}\n" + "\n".join(t.looks))
             parts.append(f'<result cmd="{cmd}">{t.text or "(no message)"}</result>')
             if t.view:
@@ -576,6 +580,7 @@ class Session:
                 print(f"{GREEN}{wrapped}{RESET}")
 
     def event(self, kind: str, turn: Turn, note: str):
+        self.map.observe(turn.state)
         parts = [f'<event type="{kind}">{note}</event>']
         if turn.text:
             parts.append(f"<engine>\n{turn.text}\n</engine>")
@@ -589,6 +594,7 @@ class Session:
 
     def new_game(self, load: Optional[Path] = None):
         self.undo.clear()
+        self.map = self.load_map(load) if load else AutoMap(self.game)
         t = self.engine.start(str(load) if load else None)
         self.start_claude()
         if load:
@@ -607,6 +613,7 @@ class Session:
             return
         path = self.save_path(name)
         if self.engine.save(path):
+            self.save_map(path)
             self.out.line(f"Saved as '{name}'.", DIM)
         else:
             self.out.line("Could not save.", YELLOW)
@@ -616,6 +623,7 @@ class Session:
         if not path.exists():
             self.out.line(f"No saved game called '{name}'. /saves lists them.", YELLOW)
             return
+        self.map = self.load_map(path)
         self.restore(path, "load", f"The player loaded the saved game '{name}'. "
                                    "Briefly set the scene where they are now.")
 
@@ -635,6 +643,25 @@ class Session:
             t = self.engine.start(str(path))
         self.event(kind, t, note)
 
+    # the map is kept next to each saved game, since the engine's save knows nothing of it
+    def save_map(self, save: Path):
+        save.with_suffix(".map.json").write_text(json.dumps(self.map.to_json()))
+
+    def load_map(self, save: Path) -> AutoMap:
+        try:
+            return AutoMap.from_json(self.game, json.loads(save.with_suffix(".map.json").read_text()))
+        except (OSError, ValueError):
+            return AutoMap(self.game)  # an older save without a map: start a new one
+
+    def show_map(self):
+        text = self.map.render(self.engine.state.get("room", -1), self.out.width)
+        self.out.end()
+        for line in text.split("\n"):
+            if line.startswith("Level "):
+                print(f"{BOLD}{line}{RESET}")
+            else:
+                print(re.sub(r"(<[^>]*>)", f"{YELLOW}{BOLD}\\1{RESET}", line, count=1))
+
     def list_saves(self):
         names = sorted(p.stem for p in self.saves.glob("*.sav"))
         self.out.line("Saved games: " + (", ".join(names) if names else "none"), DIM)
@@ -648,11 +675,7 @@ class Session:
         elif st["dark"]:
             where = "darkness"
         else:
-            where = scott.short_room(st["room_text"])
-            where = re.sub(r"^(I'm |I am )(in |on |at )?(an? |the )?", "", where)
-            where = where.rstrip(".")
-            if len(where) > 30:
-                where = where[:30].rsplit(" ", 1)[0] + "…"
+            where = scott.place_name(st["room_text"], 30)
         extra = (f" · {st['treasures_stored']}/{st['treasures_total']}" if st["treasures_total"]
                  else f" · turn {st['turn']}")
         usage = self.usage.short()
@@ -677,10 +700,15 @@ class Session:
                 self.list_saves()
             elif cmd == "new":
                 self.new_game()
+            elif cmd == "map":
+                self.show_map()
             elif cmd == "usage":
                 self.out.line(self.usage.report(self.args.model), DIM)
             else:
                 self.out.line(f"Unknown command /{cmd}. /help lists the commands.", YELLOW)
+            return True
+        if line.lower() == "map":
+            self.show_map()
             return True
         direct = self.direct_command(line)
         if direct:
@@ -692,6 +720,8 @@ class Session:
 
     def close(self) -> bool:
         saved = self.engine.alive and self.engine.save(self.save_path("autosave"))
+        if saved:
+            self.save_map(self.save_path("autosave"))
         self.engine.close()
         if self.claude:
             self.claude.close()

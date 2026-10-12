@@ -41,6 +41,20 @@ from, and about how heavy you are right now.
 - **The right verb, every time.** Claude checks every command against the game's own vocabulary before it is sent. A word the parser does not know is never sent and never costs a turn. Claude tells you which verbs the game understands instead.
 - **Grounded narration.** Claude rewrites the terse 1978 output as lively second-person prose, but only from facts the engine reported. The exits and visible items under each description come straight from the engine state, so they can never be invented.
 - **Graded hints.** The first time you ask, you get a nudge. Ask again about the same problem and the hint names the object or place. Only on the third request, or if you ask for the solution outright, do you get the exact commands. When translating, Claude is told never to add solution steps you did not ask for.
+- **A map of where you have been.** `map` draws the places you have visited as ASCII, one level per height, with what you last saw in each place, the exits you have not explored yet and the magic ways you found (`CLIMB TREE`, `SAY AWAY`...):
+
+  ```
+  Level 0 (where you started)
+                  <4 >
+                   │
+    [1 ]───[2 ]───[3 ]
+
+  Places (you are at <4>; ^ v ↕ = a way up / down):
+   1  forest  —  Trees  (N,S,W lead back here)
+   2  sunny meadow  —  Large sleeping dragon, Sign here says "In many cases mud is good…
+   3  shore of a lake  —  Water, *GOLDEN FISH*, Rusty axe (Magic word "BUNYON" on it)…
+   4  quick-sand bog  —  *Small statue of a BLUE OX*
+  ```
 - **Undo, save, load.** `/undo` takes back your last message, even after a fatal mistake. `/save` and `/load` keep named saves, and quitting saves automatically.
 - **Token and quota meter.** The status line shows the tokens used and your Claude subscription quota (5-hour and weekly windows). `/usage` gives the breakdown.
 - **All 18 games.** Each game file is decoded into a complete guide for the narrator: vocabulary with synonyms, map, items, and every rule of the game logic in readable form, including the original authors' comments.
@@ -101,6 +115,7 @@ The game files are not included, because the games are still copyrighted by Scot
 | `/undo` | take back your last action |
 | `/save [name]`, `/load [name]`, `/saves` | named saves |
 | `/new` | start over |
+| `map` or `/map` | map of the places you have visited |
 | `/usage` | tokens, estimated cost, subscription quota |
 | `/quit` | leave (the game is saved as `autosave`) |
 
@@ -146,6 +161,7 @@ claudventure.sh             launcher
 play.sh                     the original game in curses, no AI
 claudventure/
   app.py                    terminal app: Claude session, command checking, undo, saves, usage
+  automap.py                ASCII map of the visited places
   engine.py                 drives the headless engine over pipes
   scott.py                  .dat reader and game-guide generator (python3 claudventure/scott.py guide games/adv01.dat)
   narrator.md               the narrator's rules (system prompt template)
