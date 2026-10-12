@@ -45,6 +45,7 @@ from, and about how heavy you are right now.
 - **Token and quota meter.** The status line shows the tokens used and your Claude subscription quota (5-hour and weekly windows). `/usage` gives the breakdown.
 - **All 18 games.** Each game file is decoded into a complete guide for the narrator: vocabulary with synonyms, map, items, and every rule of the game logic in readable form, including the original authors' comments.
 - **A verified solution for Adventureland.** It completes the game with all 13 treasures on the real engine in 32 of 50 random-seed runs. The other runs die of the game's own random hazards (bees, chiggers).
+- **Plain game commands skip the interpretation step.** Typing `n`, `i`, `get axe` or `climb tree` sends the command straight to the engine, and Claude only narrates the outcome: one request instead of two. Use `--always-interpret` to let Claude interpret everything.
 - **No API key.** Claudventure drives Claude Code in non-interactive mode, so it runs on your Claude subscription.
 
 ## How it works
@@ -91,6 +92,7 @@ The game files are not included, because the games are still copyrighted by Scot
 ./claudventure.sh adv05             # The Count
 ./claudventure.sh --load autosave   # pick up where you left off
 ./claudventure.sh --model haiku     # faster and lighter, less accurate
+./claudventure.sh --always-interpret  # let Claude interpret even plain commands like 'n'
 ./play.sh                           # the original game, no AI
 ```
 
@@ -102,7 +104,7 @@ The game files are not included, because the games are still copyrighted by Scot
 | `/usage` | tokens, estimated cost, subscription quota |
 | `/quit` | leave (the game is saved as `autosave`) |
 
-Anything else you type goes to the narrator, whether it is an action ("light the lamp and go down"), a question ("what was written on that sign?") or a cry for help ("I'm stuck").
+A valid one- or two-word game command (`e`, `get axe`) goes straight to the game and Claude narrates the result. Anything else goes to the narrator, whether it is an action ("light the lamp and go down"), a question ("what was written on that sign?") or a cry for help ("I'm stuck").
 
 ## Choosing a model
 

@@ -33,6 +33,7 @@ RESET, DIM, CYAN, BOLD, YELLOW = "\033[0m", "\033[2m", "\033[36m", "\033[1m", "\
 GREEN = "\033[32m"
 
 HELP = """Type what you want to do, in your own words, or ask the narrator anything.
+Plain game commands (n, e, i, get axe, climb tree...) go straight to the game; Claude narrates the result.
   /undo          take back your last action
   /save [name]   save the game (default name: quick)
   /load [name]   load a saved game
@@ -436,6 +437,44 @@ class Session:
             return f"{cmd}: the parser does not know the noun '{noun}'"
         return None
 
+    def direct_command(self, line: str) -> Optional[str]:
+        """The command itself if the line is already a valid game command, else None.
+
+        Such lines go straight to the engine: Claude only narrates the outcome,
+        which saves the request that would interpret the input.
+        """
+        if self.args.always_interpret:
+            return None
+        words = line.split()
+        if not 1 <= len(words) <= 2 or not all(w.isalpha() for w in words):
+            return None
+        vb, no, err = self.game.parse_command(line)
+        if err or self.check(line):
+            return None
+        if no is not None and 1 <= no <= 6 and vb != 1:
+            return None  # "pick up", "get down": a phrasal verb, not a direction
+        return " ".join(words).upper()
+
+    def run_direct(self, cmd: str):
+        """Run a command typed in the game's own language, then let Claude narrate it."""
+        vb, _, _ = self.game.parse_command(cmd)
+        if vb == self.game.which_word("SAVE", self.game.verbs):
+            self.out.line("To save, use /save [name].", YELLOW)
+            return
+        if vb == self.game.which_word("QUIT", self.game.verbs):
+            self.out.line("To leave, use /quit (the game is saved). To start over, /new.", YELLOW)
+            return
+        if not self.engine.alive:
+            self.out.line("The game is over: use /undo, /load or /new.", YELLOW)
+            return
+        self.snapshot()
+        state_before = self.state_text(self.engine.state)
+        results, changed = self.run_commands([cmd])
+        message = (f"<player>{cmd}</player>\n<direct>The player typed this in the game's own words, "
+                   "so it was sent straight to the engine. Narrate the outcome.</direct>\n"
+                   f"<state_before>\n{state_before}\n</state_before>\n" + results)
+        self.turn(message, direct=True, view_changed=changed)
+
     def run_commands(self, cmds: List[str]) -> Tuple[str, bool]:
         """Run checked commands on the engine. Returns (message for Claude, view changed)."""
         parts, view = [], None
@@ -484,10 +523,14 @@ class Session:
             parser.finish()
         return parser.cmds
 
-    def turn(self, message: str):
-        """One player message: let Claude issue commands until it narrates."""
+    def turn(self, message: str, direct: bool = False, view_changed: bool = False):
+        """One player message: let Claude issue commands until it narrates.
+
+        direct: a command typed in the game's words has already run (and the undo
+        snapshot been taken); view_changed tells whether it changed the view.
+        """
         rounds = total = 0
-        view_changed = snapshot_taken = False
+        snapshot_taken = direct
         while True:
             cmds = self.converse(message)
             if not cmds:
@@ -639,7 +682,11 @@ class Session:
             else:
                 self.out.line(f"Unknown command /{cmd}. /help lists the commands.", YELLOW)
             return True
-        message = f"<player>{line}</player>\n<state>\n{self.state_text(self.engine.state)}\n</state>"
+        direct = self.direct_command(line)
+        if direct:
+            self.run_direct(direct)
+            return True
+        message = (f"<player>{line}</player>\n<state>\n{self.state_text(self.engine.state)}\n</state>")
         self.turn(message)
         return True
 
@@ -663,6 +710,8 @@ def main():
     ap.add_argument("--load", metavar="NAME", help="resume a saved game (e.g. autosave)")
     ap.add_argument("--seed", type=int, help="fix the engine's random numbers (testing)")
     ap.add_argument("--script", metavar="FILE", help="read player input from a file (testing)")
+    ap.add_argument("--always-interpret", action="store_true",
+                    help="let Claude interpret every input, even plain game commands like 'n' or 'get axe'")
     ap.add_argument("--list", action="store_true", help="list the available games")
     args = ap.parse_args()
 

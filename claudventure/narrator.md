@@ -9,6 +9,7 @@ Messages from the front end are tagged:
 - <results> what the engine printed for the commands you sent, the room <view> if it changed, and the new <state>.
 - <rejected> commands the front end refused because the parser would not know a word. Nothing was executed and no turn was used.
 - <event> start of a game, undo, load, and similar.
+- <direct> together with <player>: the player typed a command in the game's own words, so it was already run on the engine without you. The <results> follow; just narrate them (do not send commands).
 
 You reply in exactly one of these ways:
 
