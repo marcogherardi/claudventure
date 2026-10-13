@@ -40,7 +40,7 @@ Plain game commands (n, e, i, get axe, climb tree...) go straight to the game; C
   /load [name]   load a saved game
   /saves         list saved games
   /new           start over
-  /map           map of the places you have visited (also just: map)
+  /map           map of the places you have visited
   /usage         tokens used and subscription quota
   /quit          leave (the game is saved as 'autosave')
 Full screen: PgUp/PgDn scroll the story, Up/Down recall what you typed, Ctrl+Q quits."""
@@ -715,9 +715,6 @@ class Session:
                 self.out.line(self.usage.report(self.args.model), DIM)
             else:
                 self.out.line(f"Unknown command /{cmd}. /help lists the commands.", YELLOW)
-            return True
-        if line.lower() == "map":
-            self.show_map()
             return True
         direct = self.direct_command(line)
         if direct:

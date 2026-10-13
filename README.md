@@ -38,7 +38,7 @@ The engine stays the only authority on what happens in the game. Claude does not
 ╭──────────────────────────────────────────────────────────────────────────────────────────────────────────╮
 │  What do you want to do?  (/help for commands)                                                           │
 ╰──────────────────────────────────────────────────────────────────────────────────────────────────────────╯
- tok 2.9k + 88.7k cache · 5h 26% · 7d 26%   /help · map · PgUp/PgDn scroll · Ctrl+Q quit
+ tok 2.9k + 88.7k cache · 5h 26% · 7d 26%   /help · /map · PgUp/PgDn scroll · Ctrl+Q quit
 ```
 
 *(A real session in the full-screen interface: the story on the left; on the right the map of the current level, what is here, what you carry and the score.)*
@@ -70,19 +70,19 @@ from, and about how heavy you are right now.
 
 ## Features
 
-- **Full-screen interface.** The story scrolls on the left (PgUp/PgDn), while panels on the right always show the map of the level you are on, the exits and items here, your inventory and the score. Input has a history (Up/Down). `--plain` gives the classic scrolling text instead.
+- **Full-screen interface.** On the left, the story scrolls (PgUp/PgDn) under the name of the place you are in, with the exits and the items here below it; panels on the right always show the map of the level you are on, your inventory and the score. Input has a history (Up/Down). `--plain` gives the classic scrolling text instead.
 
 - **Natural language in, original game underneath.** "Take the axe and go north" becomes `GET AXE` followed by `NORTH`. "Pick up", "grab" and "take" all become `GET`. Compound sentences are split into several commands.
 - **The right verb, every time.** Claude checks every command against the game's own vocabulary before it is sent. A word the parser does not know is never sent and never costs a turn. Claude tells you which verbs the game understands instead.
 - **Grounded narration.** Claude rewrites the terse 1978 output as lively second-person prose, but only from facts the engine reported. The exits and visible items under each description come straight from the engine state, so they can never be invented.
 - **Graded hints.** The first time you ask, you get a nudge. Ask again about the same problem and the hint names the object or place. Only on the third request, or if you ask for the solution outright, do you get the exact commands. When translating, Claude is told never to add solution steps you did not ask for.
-- **A map of where you have been.** `map` draws the places you have visited as ASCII, one level per height, with what you last saw in each place, the exits you have not explored yet and the magic ways you found (`CLIMB TREE`, `SAY AWAY`...):
+- **A map of where you have been.** `/map` draws the places you have visited as ASCII, one level per height, with what you last saw in each place, the exits you have not explored yet and the magic ways you found (`CLIMB TREE`, `SAY AWAY`...):
 
   ```
   Level 0 (where you started)
-                  <4 >
+                  <4>
                    │
-    [1 ]───[2 ]───[3 ]
+    [1]────[2]────[3]
 
   Places (you are at <4>; ^ v ↕ = a way up / down):
    1  forest  —  Trees  (N,S,W lead back here)
@@ -152,7 +152,7 @@ The game files are not included, because the games are still copyrighted by Scot
 | `/undo` | take back your last action |
 | `/save [name]`, `/load [name]`, `/saves` | named saves |
 | `/new` | start over |
-| `map` or `/map` | map of the places you have visited |
+| `/map` | map of the places you have visited |
 | `/usage` | tokens, estimated cost, subscription quota |
 | PgUp / PgDn, Up / Down, Ctrl+Q | scroll the story, recall earlier input, quit (full-screen mode) |
 | `/quit` | leave (the game is saved as `autosave`) |

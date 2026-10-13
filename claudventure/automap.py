@@ -14,7 +14,7 @@ import scott
 DELTA = [(0, -1, 0), (0, 1, 0), (1, 0, 0), (-1, 0, 0), (0, 0, 1), (0, 0, -1)]  # N S E W U D
 SHORT = "NSEWUD"
 OPPOSITE = [1, 0, 3, 2, 5, 4]
-CELL = 7  # characters per grid column: box of 5 + connector of 2
+CELL = 7  # characters per grid column: box of up to 5 + connector
 
 
 class AutoMap:
@@ -142,7 +142,7 @@ class AutoMap:
             for r in rooms:
                 x, y = pos[r][0] - min_x, pos[r][1] - min_y
                 ex = self._exits(r)
-                mark = "↕" if ex[4] and ex[5] else "^" if ex[4] else "v" if ex[5] else " "
+                mark = "↕" if ex[4] and ex[5] else "^" if ex[4] else "v" if ex[5] else ""
                 left, right = ("<", ">") if r == current else ("[", "]")
                 box = f"{left}{num[r]:>{nw}}{mark}{right}"
                 for i, ch in enumerate(box):

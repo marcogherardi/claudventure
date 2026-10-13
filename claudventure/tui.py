@@ -1,4 +1,4 @@
-"""Full-screen interface (Textual): story on the left, map and game state on the right.
+"""Full-screen interface (Textual): header, story, exits and items on the left, map and game state on the right.
 
 The game itself (engine, Claude, undo, saves) is the same Session used by the
 plain mode; it runs in a worker thread and draws through TuiOutput.
@@ -10,6 +10,7 @@ from rich.text import Text
 from textual import work
 from textual.app import App, ComposeResult
 from textual.binding import Binding
+from textual.color import Color
 from textual.containers import Horizontal, Vertical, VerticalScroll
 from textual.screen import ModalScreen
 from textual.widgets import Input, Static
@@ -17,7 +18,12 @@ from textual.widgets import Input, Static
 import scott
 from app import BOLD, CYAN, DIM, GREEN, YELLOW, Session
 
-STYLES = {DIM: "dim", CYAN: "cyan", YELLOW: "yellow", BOLD: "bold", GREEN: "green", "": ""}
+# the narrator's asides (CYAN) in a pastel cyan, like the borders
+STYLES = {DIM: "dim", CYAN: "#97D8D8", YELLOW: "yellow", BOLD: "bold", GREEN: "green", "": ""}
+ITEM = "#97D897"  # items, here and carried: a pastel green
+
+# border colors: the theme's hues, paler and less saturated (variable -> saturation, lightness)
+PASTELS = {"primary": (0.45, 0.72), "secondary": (0.30, 0.58), "accent": (0.65, 0.76)}
 
 
 class TuiOutput:
@@ -45,6 +51,7 @@ class TuiOutput:
         self._call(self.app.story_write, text, STYLES.get(self.style, ""))
 
     def end(self):
+        self.style = ""  # as Printer.end: a style lasts until the end of its block
         self._call(self.app.story_end)
 
     def line(self, text: str, style: str = ""):
@@ -113,15 +120,20 @@ class Claudventure(App):
     CSS = """
     Screen { layout: vertical; }
     #main { height: 1fr; }
-    #story { width: 1fr; border: round $primary; padding: 0 1; }
+    #left { width: 1fr; }
+    #header { height: auto; border: round $pastel-primary; padding: 0 1; text-style: bold; }
+    #story { height: 1fr; border: round $pastel-primary; padding: 0 1; }
     #story > Static { margin: 0 0 1 0; }
+    #exits { height: auto; border: round $pastel-primary; padding: 0 1; }
+    #items { height: auto; min-height: 7; max-height: 14; border: round $pastel-primary; padding: 0 1; }
     #side { width: 42; }
-    #map { height: 1fr; border: round $secondary; padding: 0 1; }
-    #here, #inv, #score { height: auto; border: round $secondary; padding: 0 1; }
-    #cmd { border: round $accent; }
+    #map { height: 1fr; border: round $pastel-secondary; padding: 0 1; }
+    #inv, #score { height: auto; border: round $pastel-secondary; padding: 0 1; }
+    #header, #exits, #items, #map, #inv, #score { color: $text-muted; }
+    #cmd { border: round $pastel-accent; }
     #status { height: 1; padding: 0 1; color: $text-muted; }
     MapScreen { align: center middle; }
-    #fullmap { width: 90%; height: 90%; border: round $accent; padding: 0 1; background: $surface; }
+    #fullmap { width: 90%; height: 90%; border: round $pastel-accent; padding: 0 1; background: $surface; }
     """
 
     BINDINGS = [
@@ -140,14 +152,24 @@ class Claudventure(App):
 
     # layout -------------------------------------------------------------------
 
+    def get_css_variables(self):
+        variables = super().get_css_variables()
+        for name, (sat, light) in PASTELS.items():
+            hsl = Color.parse(variables[name]).hsl
+            variables[f"pastel-{name}"] = Color.from_hsl(hsl.h, sat, light).hex
+        return variables
+
     def compose(self) -> ComposeResult:
         with Horizontal(id="main"):
-            story = VerticalScroll(id="story")
-            story.border_title = f"Claudventure · {self.session.game.title}"
-            yield story
+            with Vertical(id="left"):
+                yield Static(f"Claudventure · {self.session.game.title}", id="header")
+                yield VerticalScroll(id="story")
+                for wid, title in (("exits", "Exits"), ("items", "Items here")):
+                    panel = Static(id=wid)
+                    panel.border_title = title
+                    yield panel
             with Vertical(id="side"):
-                for wid, title in (("map", "Map"), ("here", "Here"), ("inv", "Carrying"),
-                                   ("score", "Score")):
+                for wid, title in (("map", "Map"), ("inv", "Carrying"), ("score", "Score")):
                     panel = Static(id=wid)
                     panel.border_title = title
                     yield panel
@@ -229,7 +251,7 @@ class Claudventure(App):
 
     def refresh_status(self):
         usage = self.session.usage.short()
-        state = "the narrator is thinking…" if self.busy else "/help · map · PgUp/PgDn scroll · Ctrl+Q quit"
+        state = "the narrator is thinking…" if self.busy else "/help · /map · PgUp/PgDn scroll · Ctrl+Q quit"
         self.query_one("#status", Static).update(Text(f"{usage}   {state}" if usage else state))
 
     def refresh_panels(self):
@@ -254,29 +276,32 @@ class Claudventure(App):
                 body.append(line[start:end + 1], style="bold yellow")
                 body.append(line[end + 1:] + "\n")
             else:
-                body.append(line + "\n", style="dim" if line[:1].isdigit() else None)
+                body.append(line + "\n")
         map_panel.update(body)
 
-        here = Text()
-        here_panel = self.query_one("#here", Static)
+        story = self.query_one("#story")
+        exits, items = Text(), Text()
         if st.get("game_over"):
-            here_panel.border_title = "Game over"
-            here.append("/undo, /load or /new", style="yellow")
+            story.border_title = "Game over"
+            exits.append("/undo, /load or /new", style="yellow")
         elif st["dark"]:
-            here_panel.border_title = "Darkness"
-            here.append("It is too dark to see.", style="dim")
+            story.border_title = "Darkness"
+            exits.append("It is too dark to see.")
         else:
-            here_panel.border_title = scott.place_name(st["room_text"], 34)
-            here.append("Exits: " + (", ".join(st["exits"]) or "none"), style="dim")
-            for item in st["items_here"]:
-                here.append("\n" + " ".join(item.split()), style="green")
-        here_panel.update(here)
+            story.border_title = scott.place_name(st["room_text"], max(10, story.size.width - 6))
+            exits.append(", ".join(st["exits"]) or "none")
+            for i, item in enumerate(st["items_here"]):
+                items.append(("\n" if i else "") + " ".join(item.split()), style=ITEM)
+            if not st["items_here"]:
+                items.append("nothing")
+        self.query_one("#exits", Static).update(exits)
+        self.query_one("#items", Static).update(items)
 
         inv = Text()
         for i, item in enumerate(st["inventory"]):
-            inv.append(("\n" if i else "") + " ".join(item.split()))
+            inv.append(("\n" if i else "") + " ".join(item.split()), style=ITEM)
         if not st["inventory"]:
-            inv.append("nothing", style="dim")
+            inv.append("nothing")
         inv_panel = self.query_one("#inv", Static)
         inv_panel.border_title = f"Carrying {len(st['inventory'])}/{g.max_carry}"
         inv_panel.update(inv)
