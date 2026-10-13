@@ -120,7 +120,6 @@ class AutoMap:
         """Grid drawings of every level: ([(z, title, lines)], drawn exits, positions, numbers)."""
         pos = self._layout()
         num = {room: i + 1 for i, room in enumerate(self.order)}
-        nw = len(str(len(self.order)))
         min_x = min(p[0] for p in pos.values())
         min_y = min(p[1] for p in pos.values())
 
@@ -144,7 +143,7 @@ class AutoMap:
                 ex = self._exits(r)
                 mark = "↕" if ex[4] and ex[5] else "^" if ex[4] else "v" if ex[5] else ""
                 left, right = ("<", ">") if r == current else ("[", "]")
-                box = f"{left}{num[r]:>{nw}}{mark}{right}"
+                box = f"{left}{num[r]}{mark}{right}"
                 for i, ch in enumerate(box):
                     grid[y * 2][x * CELL + i] = ch
                 for d in (4, 5):  # up/down to the room right above/below: the mark says it
@@ -165,7 +164,7 @@ class AutoMap:
                         for i in range(len(box), CELL):
                             grid[y * 2][x * CELL + i] = "─"
                     else:
-                        grid[y * 2 + 1][x * CELL + 1 + (nw - 1) // 2] = "│"
+                        grid[y * 2 + 1][x * CELL + 1] = "│"  # under the first digit
             title = "Level 0 (where you started)" if z == 0 else f"Level {z:+d}" + (
                 " (up)" if z > 0 else " (down)")
             drawings.append((z, title, ["".join(row).rstrip() for row in grid
