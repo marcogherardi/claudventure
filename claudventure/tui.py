@@ -20,7 +20,7 @@ from app import BOLD, CYAN, DIM, GREEN, YELLOW, Session
 
 # the narrator's asides (CYAN) in a pastel cyan, like the borders
 STYLES = {DIM: "dim", CYAN: "#97D8D8", YELLOW: "yellow", BOLD: "bold", GREEN: "green", "": ""}
-ITEM = "#97D897"  # items, here and carried: a pastel green
+ITEM = "#A2CDA2"  # items, here and carried: a soft green
 
 # border colors: the theme's hues, paler and less saturated (variable -> saturation, lightness)
 PASTELS = {"primary": (0.45, 0.72), "secondary": (0.30, 0.58), "accent": (0.65, 0.76)}
@@ -134,6 +134,11 @@ class Claudventure(App):
     #status { height: 1; padding: 0 1; color: $text-muted; }
     MapScreen { align: center middle; }
     #fullmap { width: 90%; height: 90%; border: round $pastel-accent; padding: 0 1; background: $surface; }
+    #story, #fullmap {
+        scrollbar-background: $surface; scrollbar-background-hover: $surface;
+        scrollbar-background-active: $surface; scrollbar-color: $pastel-secondary 45%;
+        scrollbar-color-hover: $pastel-secondary 65%; scrollbar-color-active: $pastel-secondary 85%;
+    }
     """
 
     BINDINGS = [

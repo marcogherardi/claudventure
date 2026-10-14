@@ -6,42 +6,9 @@ The original games understand exactly two words, `VERB NOUN`, of which only the 
 
 The engine stays the only authority on what happens in the game. Claude does not decide outcomes.
 
-```
-╭─ Claudventure · Adventureland ─────────────────────────────────╮╭─ Level 0 (where you started) ──────────╮
-│                                                                ││ [1 ]───[2 ]───<3 >                     │
-│ You stand in a forest, thick with trees pressing in on every   ││                                        │
-│ side. Paths seem to lead off in all four directions, though    ││ 1 forest                               │
-│ the woods look much the same whichever way you turn. You       ││ 2 sunny meadow                         │
-│ carry nothing.                                                 ││ 3 shore of a lake                      │
-│                                                                ││                                        │
-│ > e                                                            ││                                        │
-│                                                                ││                                        │
-│ You step east out of the trees into a sunny meadow. A huge     ││                                        │
-│ dragon lies sleeping in the grass, utterly still. Nearby       ││                                        │
-│ stands a sign reading "In many cases mud is good. In           ││                                        │
-│ others..." The rest of the message trails off.                 ││                                        │
-│                                                                ││                                        │
-│ > e                                                            ││                                        │
-│                                                                │╰────────────────────────────────────────╯
-│ You leave the dragon snoring behind and come out on the        │╭─ shore of a lake ──────────────────────╮
-│ shore of a lake. The water laps quietly at the edge, and a     ││ Exits: North, South, West              │
-│ golden fish glints just beneath the surface. A rusty axe       ││ Water                                  │
-│ lies on the ground, with the magic word "BUNYON" marked on     ││ *GOLDEN FISH*                          │
-│ it. A sign warns: "No swimming allowed here."                  ││ Sign says "No swimming allowed here"   │
-│                                                                │╰────────────────────────────────────────╯
-│ > get axe                                                      │╭─ Carrying 1/6 ─────────────────────────╮
-│                                                                ││ Rusty axe (Magic word "BUNYON" on it)  │
-│ You pick up the rusty axe. Its blade is pitted with age, and   │╰────────────────────────────────────────╯
-│ the word "BUNYON" is still plainly marked on it.               │╭─ Score ────────────────────────────────╮
-│                                                                ││ Treasures 0/13 · Turn 3 · No light     │
-╰────────────────────────────────────────────────────────────────╯╰────────────────────────────────────────╯
-╭──────────────────────────────────────────────────────────────────────────────────────────────────────────╮
-│  What do you want to do?  (/help for commands)                                                           │
-╰──────────────────────────────────────────────────────────────────────────────────────────────────────────╯
- tok 2.9k + 88.7k cache · 5h 26% · 7d 26%   /help · /map · PgUp/PgDn scroll · Ctrl+Q quit
-```
+<img src="docs/screenshot.png" alt="Claudventure in the full-screen interface" width="900">
 
-*(A real session in the full-screen interface: the story on the left; on the right the map of the current level, what is here, what you carry and the score.)*
+*(A real session in the full-screen interface: on the left the story, under the name of the place, with the narrator's answers to questions in cyan, then the exits and the items here; on the right the map of the current level, what you carry and the score.)*
 
 Claude translates whatever you write, and answers when you talk to it rather than to the game:
 
