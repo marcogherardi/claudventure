@@ -1,0 +1,239 @@
+# Sorcerer of Claymorgue Castle - complete solution (13 stars). Verified with
+#   python3 claudventure/walkthrough.py games/adv13.dat claudventure/walkthroughs/adv13.txt
+# Lines starting with '#' are notes. 'if here "X": CMD' means: do CMD only if
+# X is in the room ('carrying': carried; 'said': in the last message; 'not'
+# reverses it). Based on the classic walkthrough, checked and adjusted on the
+# engine.
+# Spells work once (Yoho twice). The stars go in the hollow tree in the
+# enchanted forest, reachable only with the Permeability spell, once: Yoho
+# takes you out to the field and, cast again, back into the tree.
+# About 1 game in 3 still ends badly in the Fountain of Youth, which takes
+# years off you at random until you dry off: four moves there are unavoidable.
+# The Spell of Methuselah, meant to make up for it, ages you by up to 114
+# years in all and makes the odds worse: this solution leaves it unused.
+
+DIG
+W
+# Cast spells as CAST X; the fire spell then asks what at
+CAST FIRE
+AT TREE
+LOOK ASHES
+E
+# Hold your breath (8 moves). Under the moat a passage leads to the kitchen
+# drain; the cabinet there holds the Spell of Bliss
+GO MOAT
+GET BREATH
+SWIM DOWN
+SWIM DOWN
+GET TOWEL
+SWIM EAST
+BREATHE
+OPEN CABIN
+U
+GET CRATE
+S
+DROP STAR
+DROP STAR
+DROP WICKED
+S
+# The plain room's walls move: pull west, push east, push south, push down
+PULL WEST
+GET METHUSELAH
+GET UNRAVEL
+E
+PUSH EAST
+# Open sesame (seed) on the stone door, now, saves time later
+CAST SEED
+W
+N
+DROP METHUSELAH
+E
+# The unravelled rope drops the chandelier: be out of the ballroom by then
+CAST UNRAVEL
+W
+S
+PUSH SOUTH
+GET STAR
+D
+# As a ferret you scare off the rats and fit through their hole; say WALK UP
+CAST LYCANTHROPE
+GO HOLE
+GET STAR
+GO HOLE
+WALK UP
+N
+N
+DROP STAR
+DROP STAR
+W
+# The lever lowers the drawbridge (and breaks off)
+PULL LEVER
+DROP WOOD
+GO DRAWBRIDGE
+# From here on hurry: Bliss makes you float for about 30 moves. Dive to the
+# bottom of the moat; Bliss lifts you out of the water
+GO MOAT
+GET BREATH
+SWIM DOWN
+SWIM DOWN
+SWIM DOWN
+SWIM DOWN
+SWIM DOWN
+LOOK BOTTOM
+CAST BLISS
+GO DRAWBRIDGE
+E
+E
+S
+PUSH EAST
+GO DOOR
+D
+# Floating, you can cross the lava; the wrung towel dries there
+SQUEEZE TOWEL
+GO LAVA
+DROP TOWEL
+S
+GET STAR
+GET DIZZY
+N
+GET TOWEL
+N
+U
+U
+W
+N
+E
+# Light squared lifts the fallen chandelier to the loft. Throw the crate down
+# and jump (still floating); in the broken crate is a can opener
+GO CHANDELIER
+CAST LIGHT
+GO LOFT
+GET POTION
+THROW CRATE
+JUMP
+GO CHANDELIER
+GET STAR
+GO BALLROOM
+GO CRATE
+GO HOLE
+GET METAL
+GO HOLE
+JUMP
+W
+DROP STAR
+DROP STAR
+DROP STAR
+S
+PUSH EAST
+# The potion makes you invisible to the dragon, the dust makes it sneeze
+# away from a hole. Never speak near the dragon
+GET DUST
+W
+DRINK POTION
+PUSH DOWN
+GET STAR
+LOOK DRAGON
+THROW DUST
+GO HOLE
+GET STAR
+GET FIREFLY
+W
+U
+N
+DROP STAR
+DROP STAR
+DROP STAR
+# Dizzy Dean gives you arms of steel to knock the can off the battlements
+# with the bricks; when you miss, the bricks land on the other side
+GET BRICKS
+CAST DIZZY
+if carrying "Fire bricks": THROW BRICK
+if said "at what": AT CAN
+if not carrying "Tin can": W
+if not carrying "Tin can": GO DRAWBRIDGE
+if here "Tin can": GET CAN
+if here "Fire bricks": GET BRICKS
+if carrying "Fire bricks": THROW BRICK
+if said "at what": AT CAN
+if not carrying "Tin can": E
+if not carrying "Tin can": E
+if here "Tin can": GET CAN
+if here "Fire bricks": GET BRICKS
+if carrying "Fire bricks": THROW BRICK
+if said "at what": AT CAN
+if not carrying "Tin can": W
+if not carrying "Tin can": GO DRAWBRIDGE
+if here "Tin can": GET CAN
+if here "Fire bricks": GET BRICKS
+if carrying "Fire bricks": THROW BRICK
+if said "at what": AT CAN
+if not carrying "Tin can": E
+if not carrying "Tin can": E
+if here "Tin can": GET CAN
+if here "Fire bricks": GET BRICKS
+if carrying "Fire bricks": THROW BRICK
+if said "at what": AT CAN
+if not carrying "Tin can": W
+if not carrying "Tin can": GO DRAWBRIDGE
+if here "Tin can": GET CAN
+if here "Fire bricks": GET BRICKS
+if carrying "Fire bricks": THROW BRICK
+if said "at what": AT CAN
+if not carrying "Tin can": E
+if not carrying "Tin can": E
+if here "Tin can": GET CAN
+if here "Fire bricks": GET BRICKS
+if here "Moat": E
+if here "Lowered drawbridge": E
+OPEN CAN
+USE METAL
+LOOK CAN
+DROP CAN
+DROP METAL
+DROP TOWEL
+DROP FIREFLY
+# Ten things at most: the Permeability and Yoho spells and eight stars
+GET PERMEABILITY
+GET STAR
+GET STAR
+GET STAR
+GET STAR
+GET STAR
+GET STAR
+GET STAR
+W
+GO DRAWBRIDGE
+W
+W
+CAST PERMEABILITY
+DROP STAR
+DROP STAR
+DROP STAR
+DROP STAR
+DROP STAR
+DROP STAR
+DROP STAR
+DROP STAR
+CAST YOHO
+GO DRAWBRIDGE
+E
+E
+GET STAR
+GET STAR
+GET STAR
+GET TOWEL
+# The Fountain of Youth: get the star, climb the centrepiece and go down the
+# air shaft to the dungeon (another star, in the dark), then dry off at once
+GO FOUNTAIN
+GET STAR
+GO CENTER
+GO SHAFT
+DRY ME
+GET STAR
+CAST YOHO
+DROP STAR
+DROP STAR
+DROP STAR
+DROP STAR
+DROP STAR
+SCORE

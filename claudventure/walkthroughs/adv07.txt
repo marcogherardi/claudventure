@@ -1,0 +1,148 @@
+# Mystery Fun House - complete solution. Verified with
+#   python3 claudventure/walkthrough.py games/adv07.dat claudventure/walkthroughs/adv07.txt
+# win: You've done it
+# Lines starting with '#' are notes. 'if carrying "X": CMD' means: do CMD
+# only if you carry X. Winning means getting the missing top secret plans.
+# The park closes at midnight (LOOK WATCH): plenty of time.
+
+# The bouncer throws you out without shoes on or without a ticket. The loose
+# heel hides a letter and a short fuse (leave the fuse here for later)
+WEAR SHOES
+REMOVE HEEL
+DROP HEEL
+DROP WATCH
+# A coin lies at the bottom of the drain in the parking lot: the chewed gum on
+# a branch picks it up. The gum dries out again now and then: chew it again
+E
+GET BRANCH
+CHEW GUM
+if carrying "Hard dry chewing gum": CHEW GUM
+if carrying "Hard dry chewing gum": CHEW GUM
+if carrying "Hard dry chewing gum": CHEW GUM
+ON BRANCH
+USE BRANCH
+DROP BRANCH
+DROP GUM
+# The ticket lady wants a dollar (the $5 bill is a grocery bill)
+W
+DROP DOLLAR
+GO FUN
+# Through the maze to the room with the low ceiling: its knobs swing the wall
+# round to other rooms (blue: fortune machine, green: trampoline room)
+N
+S
+E
+W
+W
+PULL BLUE
+GET SIGN
+D
+PULL GREEN
+GET TRAMPOLINE
+S
+# The gun in the shooting gallery covers the large room beyond: the "out of
+# order" sign from the fortune machine, left here, keeps it quiet
+DROP SIGN
+GET SPECTACLES
+WEAR SPECTACLES
+N
+U
+W
+U
+U
+E
+E
+E
+# The spectacles show a hidden door in the magical mirror
+OPEN DOOR
+DROP SPECTACLES
+GO DOOR
+GET HANDLE
+E
+N
+S
+E
+W
+W
+W
+U
+U
+U
+U
+# The ladder retracts once you are in the pit: the trampoline gets you out.
+# The handle fits the valve: turning it quiets the steam calliope
+GO LADDER
+DROP HANDLE
+TURN VALVE
+DROP TRAMPOLINE
+GO TRAMPOLINE
+JUMP
+# From the barrel room CRAWL back out
+E
+GET COMB
+GET MATCH
+CRAWL
+S
+D
+# Down the slide into the mermaid's tank: combed hair, she opens a way out
+GO SLIDE
+GET KEY
+DROP COMB
+GO STAIRS
+N
+D
+E
+# With the calliope quiet you can ride the merry-go-round; stop it (blue
+# button), climb the pole, look up and jump for the rope to the catwalk
+PULL BLUE
+E
+PRESS BLUE
+GO MERRY
+GO HORSE
+GO POLE
+LOOK UP
+JUMP
+E
+# The rusty key opens the shelves in the store room
+OPEN DOOR
+DROP KEY
+GET FLASHLIGHT
+GET WRENCH
+W
+GO ROPE
+D
+D
+D
+S
+D
+W
+U
+U
+E
+E
+E
+S
+DROP TICKET
+GET FUSE
+E
+# The wrench loosens one bolt of the drain grating: a manhole down to the
+# sewer. Close the flood door, or the guard hears the blast; never hold the fuse
+USE WRENCH
+MOVE GRATE
+DROP WRENCH
+GET GUM
+LIGHT FLASHLIGHT
+GO HOLE
+E
+CLOSE DOOR
+CHEW GUM
+if carrying "Hard dry chewing gum": CHEW GUM
+if carrying "Hard dry chewing gum": CHEW GUM
+if carrying "Hard dry chewing gum": CHEW GUM
+ON FUSE
+ON GRATE
+LIGHT FUSE
+GO HOLE
+U
+S
+GET PLANS

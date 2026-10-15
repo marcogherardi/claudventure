@@ -1,0 +1,293 @@
+# Savage Island, Part I - complete solution. Verified with
+#   python3 claudventure/walkthrough.py games/adv10.dat claudventure/walkthroughs/adv10.txt
+# win: SAVE THIS PASSWORD
+# Lines starting with '#' are notes. 'if here "X": CMD' means: do CMD only if
+# X is in the room ('carrying': carried; 'said': in the last message; 'not'
+# reverses it, 'and' joins two conditions).
+# The game ends with a password for Part II: 123 if you carry the pirate's
+# bandanna, else 474. Only 123 can win Part II. This solution gives 474: the
+# pirate (on the atoll, late in the game) trades the bandanna for the bottle
+# of rum, but the bottle is the only container in the game and is needed first
+# for seawater. Keeping the rum (poured into the stone basin in the cave) means
+# fetching the seawater during the hurricane, a far more dangerous route.
+# About 1 game in 4 still ends badly: climbing the volcano makes you sweat, and
+# the bear down there kills a sweaty stranger. Swimming washes the sweat off.
+# A hurricane strikes after about 70 moves: it only passes once the bear is
+# tame, and outdoors it can blow you out to sea.
+
+# Dig in the sand with your hands
+DIG
+WITH HANDS
+LOOK HOLE
+GET BOTTLE
+EMPTY BOTTLE
+D
+GET WATER
+S
+S
+GO VOLCANO
+GO VOLCANO
+if not here "Bear": DROP BOTTLE
+if not carrying "seawater": GO LAKE
+if not carrying "seawater": SWIM OUT
+if not carrying "seawater": GET BOTTLE
+# Seawater poured on the hot rocks outside the volcano dries to salt. The bear
+# loves salt: once fed, it is tame
+GO CAVE
+GO CREVICE
+EMPTY BOTTLE
+if not here "Pile of salt": LOOK
+if not here "Pile of salt": LOOK
+if not here "Pile of salt": LOOK
+if not here "Pile of salt": LOOK
+if not here "Pile of salt": LOOK
+if not here "Pile of salt": LOOK
+if not here "Pile of salt": LOOK
+if not here "Pile of salt": LOOK
+if not here "Pile of salt": LOOK
+if not here "Pile of salt": LOOK
+if not here "Pile of salt": LOOK
+if not here "Pile of salt": LOOK
+if not here "Pile of salt": LOOK
+if not here "Pile of salt": LOOK
+if not here "Pile of salt": LOOK
+if not here "Pile of salt": LOOK
+if not here "Pile of salt": LOOK
+if not here "Pile of salt": LOOK
+if not here "Pile of salt": LOOK
+if not here "Pile of salt": LOOK
+if not here "Pile of salt": LOOK
+if not here "Pile of salt": LOOK
+if not here "Pile of salt": LOOK
+if not here "Pile of salt": LOOK
+if not here "Pile of salt": LOOK
+if not here "Pile of salt": LOOK
+if not here "Pile of salt": LOOK
+if not here "Pile of salt": LOOK
+if not here "Pile of salt": LOOK
+if not here "Pile of salt": LOOK
+if not here "Pile of salt": LOOK
+if not here "Pile of salt": LOOK
+if not here "Pile of salt": LOOK
+if not here "Pile of salt": LOOK
+if not here "Pile of salt": LOOK
+if not here "Pile of salt": LOOK
+if not here "Pile of salt": LOOK
+if not here "Pile of salt": LOOK
+if not here "Pile of salt": LOOK
+if not here "Pile of salt": LOOK
+if not here "Pile of salt": LOOK
+if not here "Pile of salt": LOOK
+if not here "Pile of salt": LOOK
+if not here "Pile of salt": LOOK
+if not here "Pile of salt": LOOK
+if not here "Pile of salt": LOOK
+if not here "Pile of salt": LOOK
+if not here "Pile of salt": LOOK
+if not here "Pile of salt": LOOK
+if not here "Pile of salt": LOOK
+if not here "Pile of salt": LOOK
+if not here "Pile of salt": LOOK
+if not here "Pile of salt": LOOK
+if not here "Pile of salt": LOOK
+if not here "Pile of salt": LOOK
+if not here "Pile of salt": LOOK
+if not here "Pile of salt": LOOK
+if not here "Pile of salt": LOOK
+if not here "Pile of salt": LOOK
+if not here "Pile of salt": LOOK
+GET SALT
+GO CREVICE
+DROP SALT
+if here "Pile of salt": LOOK
+if here "Pile of salt": LOOK
+if here "Pile of salt": LOOK
+if here "Pile of salt": LOOK
+if here "Pile of salt": LOOK
+if here "Pile of salt": LOOK
+if here "Pile of salt": LOOK
+if here "Pile of salt": LOOK
+if here "Pile of salt": LOOK
+if here "Pile of salt": LOOK
+if here "Pile of salt": LOOK
+if here "Pile of salt": LOOK
+if here "Pile of salt": LOOK
+if here "Pile of salt": LOOK
+if here "Pile of salt": LOOK
+if here "Pile of salt": LOOK
+if here "Pile of salt": LOOK
+if here "Pile of salt": LOOK
+if here "Pile of salt": LOOK
+if here "Pile of salt": LOOK
+if here "Pile of salt": LOOK
+if here "Pile of salt": LOOK
+if here "Pile of salt": LOOK
+if here "Pile of salt": LOOK
+if here "Pile of salt": LOOK
+if here "Pile of salt": LOOK
+if here "Pile of salt": LOOK
+if here "Pile of salt": LOOK
+if here "Pile of salt": LOOK
+if here "Pile of salt": LOOK
+# Sit out the hurricane in the cave (WAIT passes time quickly)
+WAIT
+if not said "Hurricane": WAIT
+WAIT
+# A piece of wire is buried in the bat guano in the maze
+GO OPENING
+S
+N
+DIG
+WITH HANDS
+GET WIRE
+GO OPENING
+E
+# Carrying anything you sink in the lake, unless you hold on to a palm log; a
+# log will not fit through the crevice on the ledge. The storm felled two palms
+DROP BOTTLE
+DROP WIRE
+GO LAKE
+SWIM WEST
+GO CREVICE
+JUMP
+E
+E
+GET LOG
+W
+S
+GO VOLCANO
+GET WIRE
+GO LAKE
+# Hold your breath (7 moves), dive and swim north for the knife
+GET BREATH
+DROP LOG
+SWIM DOWN
+SWIM NORTH
+GET KNIFE
+SWIM UP
+GET LOG
+SWIM WEST
+DROP KNIFE
+DROP WIRE
+E
+# The ash makes you slide back down, but the log goes over the rim
+SWIM OUT
+U
+GO LAKE
+SWIM WEST
+GET KNIFE
+GET WIRE
+GO CREVICE
+JUMP
+E
+# Vines, two logs and the knife make a raft, but only at the tidepool.
+# Never cut the coconuts. The raft drifts where it likes and soon falls apart:
+# if it starts coming apart, land at the tidepool and rebuild it
+CUT VINE
+GET VINE
+E
+GO TREE
+GET COCONUTS
+D
+GET LOG
+W
+D
+DROP LOG
+S
+S
+GET LOG
+N
+D
+BUILD RAFT
+GO RAFT
+if not here "Beach": PADDLE
+if not here "Beach": PADDLE
+if not here "Beach": PADDLE
+if not here "Beach": PADDLE
+if not here "Beach": PADDLE
+if not here "Beach": PADDLE
+if not here "Beach" and not here "Tidepool": PADDLE
+if not here "Beach" and not here "Tidepool": PADDLE
+if not here "Beach" and not here "Tidepool": PADDLE
+if not here "Beach" and not here "Tidepool": PADDLE
+if not here "Beach" and not here "Tidepool": PADDLE
+if here "Tidepool": GO TIDEPOOL
+if here "Raft of vines": CUT VINE
+if here "Palm log": S
+if here "jungle": CUT VINE
+if here "pliable vines": GET VINE
+if here "jungle": D
+if here "Palm log": BUILD RAFT
+if here "Raft of vines": GO RAFT
+if not here "Beach": PADDLE
+if not here "Beach": PADDLE
+if not here "Beach": PADDLE
+if not here "Beach": PADDLE
+if not here "Beach": PADDLE
+if not here "Beach": PADDLE
+if not here "Beach" and not here "Tidepool": PADDLE
+if not here "Beach" and not here "Tidepool": PADDLE
+if not here "Beach" and not here "Tidepool": PADDLE
+if not here "Beach" and not here "Tidepool": PADDLE
+if not here "Beach" and not here "Tidepool": PADDLE
+if here "Tidepool": GO TIDEPOOL
+if here "Raft of vines": CUT VINE
+if here "Palm log": S
+if here "jungle": CUT VINE
+if here "pliable vines": GET VINE
+if here "jungle": D
+if here "Palm log": BUILD RAFT
+if here "Raft of vines": GO RAFT
+if not here "Beach": PADDLE
+if not here "Beach": PADDLE
+if not here "Beach": PADDLE
+if not here "Beach": PADDLE
+if not here "Beach": PADDLE
+if not here "Beach": PADDLE
+if not here "Beach" and not here "Tidepool": PADDLE
+if not here "Beach" and not here "Tidepool": PADDLE
+if not here "Beach" and not here "Tidepool": PADDLE
+if not here "Beach" and not here "Tidepool": PADDLE
+if not here "Beach" and not here "Tidepool": PADDLE
+if here "Tidepool": GO TIDEPOOL
+if here "Raft of vines": CUT VINE
+if here "Palm log": S
+if here "jungle": CUT VINE
+if here "pliable vines": GET VINE
+if here "jungle": D
+if here "Palm log": BUILD RAFT
+if here "Raft of vines": GO RAFT
+if not here "Beach": PADDLE
+if not here "Beach": PADDLE
+if not here "Beach": PADDLE
+if not here "Beach": PADDLE
+if not here "Beach": PADDLE
+if not here "Beach": PADDLE
+if not here "Beach": PADDLE
+if not here "Beach": PADDLE
+if not here "Beach": PADDLE
+if not here "Beach": PADDLE
+if not here "Beach": PADDLE
+if not here "Beach": PADDLE
+# The coconuts move the hinged stalactite: behind it, alien tunnels
+GO BEACH
+GO CAVE
+WITH COCONUTS
+GO CREVICE
+N
+E
+S
+# The wire mends the alien machinery; the button on the caveman's case then
+# opens it. Never open the dinosaur's case. The password the console wants is
+# FREE ("to tell you a word's free", in the pirate's note)
+WITH WIRE
+N
+W
+S
+E
+MOVE BUTTON
+W
+N
+W
+ASK FREE
+GO FORCE

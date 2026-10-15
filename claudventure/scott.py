@@ -85,6 +85,11 @@ class Game:
     version: int = 0
     adventure: int = 0
 
+    @property
+    def has_darkness(self) -> bool:
+        """Whether any place can be dark: only then does the light source matter."""
+        return any(56 in a.actions for a in self.actions)
+
     # --- vocabulary, mirroring WhichWord() in ScottCurses.c ---------------
 
     def _match(self, word: str, entry: str) -> bool:
@@ -188,8 +193,12 @@ def short_room(text: str) -> str:
 def place_name(text: str, maxlen: int = 40) -> str:
     """Short name of a room for the player: 'I'm on the shore of a lake' -> 'shore of a lake'."""
     t = text[1:] if text.startswith("*") else text
-    t = " ".join(t.split("\n")[0].split())
-    t = re.sub(r"^(I'm |I am |You're |You are )(in |on |at )?(an? |the )?", "", t).rstrip(".")
+    lines = t.split("\n")
+    t = lines[0]
+    if len(lines) > 1 and re.search(r"\b(in|on|at|of|an?|the|and|to|with|over|by|from|into)$", t.strip(), re.I):
+        t += " " + lines[1]  # 'underwater in / thick murky fluid'
+    t = " ".join(re.split(r"[.!]\s", t + " ")[0].split())  # the first sentence
+    t = re.sub(r"^(I'm |I am |You're |You are )(in |on |at )?(an? |the )?", "", t, flags=re.I).rstrip(".!")
     if len(t) > maxlen:
         t = t[:maxlen].rsplit(" ", 1)[0] + "…"
     return t
@@ -388,7 +397,7 @@ def guide(g: Game) -> str:
     w("- A direction alone (NORTH, N, ...) moves. Single letters n/s/e/w/u/d/i are accepted.")
     w("- Unknown verbs are rejected without using a turn. Any other command uses a turn.")
     w(f"- Carry limit: {g.max_carry} items. GET ALL / DROP ALL exist.")
-    if g.light_time > 0 and g.light_time < 5000:
+    if g.has_darkness and 0 < g.light_time < 5000:
         w(f"- The light source (item I{LIGHT_SOURCE}) lasts {g.light_time} turns once it is in play.")
     if g.treasures:
         w(f"- {g.treasures} treasures (items whose name starts with '*'). Store them in "

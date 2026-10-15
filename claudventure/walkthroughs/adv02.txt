@@ -1,0 +1,225 @@
+# Pirate Adventure - complete solution (2 treasures). Verified with
+#   python3 claudventure/walkthrough.py games/adv02.dat claudventure/walkthroughs/adv02.txt
+# Lines starting with '#' are notes; lines starting with '?' are only needed
+# in some cases. 'if here "X": CMD' means: do CMD only if X is in the room
+# ('if said "X"': only if the last message said X). The tide and the
+# pirate's moods are random.
+
+# London. The sneakers stop you slipping off the window ledge
+GET SNEAKERS
+GET RUM
+GET CRACKERS
+# Taking the book opens the secret passage
+GO STAIRS
+GET BOOK
+GO PASSAGE
+E
+OPEN BAG
+GET MATCHES
+GET TORCH
+W
+W
+# YOHO (written in the book) takes you from anywhere to the ledge, and
+# from the ledge to Pirates Island; it only works carrying the book
+GO WINDOW
+SAY YOHO
+
+# The pirate leaves the shack for the rum. The parrot always flies to the
+# crackers: leave them in the shack and it stays there
+E
+GO SHACK
+DROP RUM
+DROP CRACKERS
+if here "Wicked looking pirate": LOOK
+if here "Wicked looking pirate": LOOK
+if here "Wicked looking pirate": LOOK
+
+# The book does not fit through the crack, and the cavern is dark
+W
+E
+DROP BOOK
+GO PATH
+LIGHT TORCH
+GO CRACK
+GO SHED
+GET HAMMER
+GET WINGS
+N
+GO CRACK
+UNLIGHT TORCH
+D
+DROP TORCH
+DROP MATCHES
+DROP WINGS
+
+# Back to London: the hammer pulls the nails out of the rug, and carrying
+# the rug makes the keys appear. The pirate sleeps in the attic now: woken
+# up, he goes to wait on his ship. He left an empty bottle there
+GET BOOK
+SAY YOHO
+GO WINDOW
+D
+GET NAILS
+GET RUG
+DROP RUG
+GET KEYS
+GO STAIRS
+GO PASSAGE
+E
+WAKE PIRATE
+GET BOTTLE
+W
+W
+GO WINDOW
+SAY YOHO
+DROP SNEAKERS
+DROP NAILS
+DROP HAMMER
+
+# The chest holds the plans, then (look again) the map
+E
+GO SHACK
+UNLOCK CHEST
+LOOK CHEST
+LOOK CHEST
+GET PLANS
+GET MAP
+W
+W
+DROP PLANS
+DROP MAP
+DROP BOOK
+E
+E
+GET WINGS
+GET TORCH
+GET MATCHES
+W
+W
+
+# Water wings keep you afloat in the ocean and in the lagoon at high tide.
+# The fish needs the bottle of salt water, or it slips away
+GO LAGOON
+N
+GET WATER
+GET FISH
+S
+S
+
+# Fed the fish, the crocodiles leave the pit; the door there opens with the
+# keys and leads back into the cavern, a way out for things too big for the crack
+E
+E
+LIGHT TORCH
+GO CAVE
+D
+DROP FISH
+if here "crocodiles": LOOK
+if here "crocodiles": LOOK
+if here "crocodiles": LOOK
+UNLOCK DOOR
+GO HALL
+E
+GO SHED
+GET SHOVEL
+DROP BOTTLE
+DROP KEYS
+N
+GET LUMBER
+GET SAILS
+W
+GO PIT
+U
+W
+UNLIGHT TORCH
+W
+W
+DROP LUMBER
+DROP SAILS
+
+# The anchor is stuck in the sand and only shows at low tide: WAIT changes the tide
+GO LAGOON
+if here "tide is coming in": WAIT
+if here "tide is coming in": WAIT
+if here "tide is coming in": WAIT
+DIG ANCHOR
+GET ANCHOR
+S
+# The plans list hammer, nails, lumber, anchor, sails and the keel (here on the beach)
+BUILD BOAT
+DROP TORCH
+DROP MATCHES
+DROP WINGS
+GET HAMMER
+GET MAP
+
+E
+GO SHACK
+GET PARROT
+GET CRACKERS
+W
+W
+# The pirate sails only with the map, without the book, at high tide
+GO SHIP
+SET SAIL
+if said "waiting for the tide": WAIT
+if said "Tides be a changing": SET SAIL
+if said "waiting for the tide": WAIT
+if said "Tides be a changing": SET SAIL
+if said "waiting for the tide": WAIT
+if said "Tides be a changing": SET SAIL
+if said "waiting for the tide": WAIT
+if said "Tides be a changing": SET SAIL
+if said "waiting for the tide": WAIT
+if said "Tides be a changing": SET SAIL
+if said "waiting for the tide": WAIT
+if said "Tides be a changing": SET SAIL
+
+# Treasure Island. The pirate follows you ashore: dig up rum for him and he
+# goes to sleep in the graveyard; wake him and he goes back to the ship
+GO SHORE
+DIG
+if here "Wicked looking pirate": LOOK
+if here "Wicked looking pirate": LOOK
+if here "Wicked looking pirate": LOOK
+if here "Wicked looking pirate": LOOK
+if here "Wicked looking pirate": LOOK
+if here "Wicked looking pirate": LOOK
+if here "Wicked looking pirate": LOOK
+if here "Wicked looking pirate": LOOK
+if here "Wicked looking pirate": LOOK
+if here "Wicked looking pirate": LOOK
+S
+WAKE PIRATE
+# The map says "30 paces then dig"
+E
+GO 30
+DIG
+DROP SHOVEL
+OPEN BOX
+DROP HAMMER
+GET STAMPS
+# The parrot drives off the snakes, but only when it is free (dropped)
+GO MONASTARY
+DROP PARROT
+DROP CRACKERS
+if here "mamba": LOOK
+if here "mamba": LOOK
+if here "mamba": LOOK
+GET DUBLEONS
+W
+W
+N
+GO SHIP
+SET SAIL
+GO SHORE
+# Treasures go to the flat in London
+DROP MAP
+GET BOOK
+GET SNEAKERS
+SAY YOHO
+GO WINDOW
+D
+DROP STAMPS
+DROP DUBLEONS
+SCORE

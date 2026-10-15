@@ -1,0 +1,236 @@
+# Pyramid of Doom - complete solution (13 treasures). Verified with
+#   python3 claudventure/walkthrough.py games/adv08.dat claudventure/walkthroughs/adv08.txt
+# Lines starting with '#' are notes. 'if here "X": CMD' means: do CMD only if
+# X is in the room ('carrying': carried; 'not' reverses it).
+# The treasure room is the hieroglyphics room. Carry the pistol: the nomad who
+# follows you only jumps you when you are unarmed.
+# About 1 game in 4 still ends badly: the starving rats bite now and then when
+# you walk in on them, and the mummy can wake up as you arrive.
+
+# The pole is a shovel; the canteen fills at the pool
+GET POLE
+GET WATER
+E
+N
+# A tiny key is buried in the desert
+DIG
+GET KEY
+S
+# Taking the stone uncovers a door in the pyramid; a large stone falls on whoever
+# unlocks it before the trap in the hole below is switched off with the tiny key
+GET STONE
+DROP STONE
+DIG
+GO HOLE
+UNLOCK DOOR
+U
+W
+GO POOL
+GET KEY
+E
+E
+UNLOCK DOOR
+# Keep the tiny key (the coffer)
+DROP KEY
+DROP KEY
+GET KEY
+DROP SHOVEL
+LIGHT FLASHLIGHT
+GO DOOR
+GET PISTOL
+# Searching (LOOK) finds things. The coal, cleaned with water, is a ruby.
+# Never touch the basket: there is a cobra in it
+S
+LOOK ASHES
+GET NECKLACE
+LOOK FIREPLACE
+GET COAL
+CLEAN COAL
+N
+N
+E
+GET FLUTE
+W
+S
+S
+# The flute charms the cobra into opening a passage to the rats' crawlway;
+# a shot scares the rats into the next room, and back
+PLAY FLUTE
+GO PASSAGE
+SHOOT RATS
+N
+SHOOT RATS
+E
+DROP NECKLACE
+# Fed the jerky, the giant oyster gives a black pearl and lets you through
+GET JERKY
+W
+N
+DROP JERKY
+GET PEARL
+GO ARCHWAY
+E
+DROP PEARL
+DROP FLUTE
+W
+N
+W
+S
+# Water on the burning tanna leaves puts the mummy to sleep
+UNLOCK SARCOPHAGUS
+GO SARCOPHAGUS
+GO STAIRS
+POUR WATER
+DROP CANTEEN
+GET TAPESTRY
+GO ALCOVE
+LOOK SKULL
+GET TEETH
+GET SKULL
+# The box holds bones, then an iron glove; the skull goes back on the skeleton
+# in the tall room, who pulls down a ladder
+LOOK BOX
+LOOK BOX
+GET GLOVE
+W
+DROP GLOVE
+DROP RUBY
+S
+DROP SKULL
+GET SAW
+N
+U
+W
+N
+# Sawing the table frees a diamond necklace
+SAW TABLE
+GET NECKLACE
+E
+GO ARCHWAY
+E
+DROP TAPESTRY
+DROP TEETH
+DROP NECKLACE
+DROP SAW
+W
+N
+W
+S
+GO SARCOPHAGUS
+D
+GET GLOVE
+N
+# The iron glove punches through the bricked up doorway. It slips off a
+# sweaty hand: wear it only when needed
+WEAR GLOVE
+if here "Iron glove": GET GLOVE
+if not carrying "wearing an iron glove": WEAR GLOVE
+if here "Iron glove": GET GLOVE
+if not carrying "wearing an iron glove": WEAR GLOVE
+PUNCH DOOR
+if here "Iron glove": GET GLOVE
+if carrying "wearing an iron glove": REMOVE GLOVE
+GO DOOR
+# The mirror room blinds you if the flashlight is on; feel the floor
+FEEL FLOOR
+GET COIN
+E
+GET SCARAB
+W
+W
+LIGHT FLASHLIGHT
+S
+DROP GLOVE
+U
+W
+N
+E
+GO ARCHWAY
+E
+DROP COIN
+DROP SCARAB
+W
+N
+W
+S
+GO SARCOPHAGUS
+D
+GET RUBY
+N
+GET ROPE
+S
+S
+GO LADDER
+N
+# Search the rubbish only once (dengue fever). Never open the portal (a worm)
+LOOK EXPLORER
+GET PIN
+LOOK RUBBISH
+GET CARVING
+S
+GET SAPPHIRE
+THROW ROPE
+# The rope reaches the throne room; the ruby, the iron Pharaoh's heart, thrown
+# into the acid destroys him. Then the chest and the chain (a staircase)
+THROW RUBY
+GO ROPE
+UNLOCK CHEST
+GET CROWN
+PULL CHAIN
+D
+W
+D
+N
+U
+W
+N
+E
+GO ARCHWAY
+E
+DROP PIN
+DROP CARVING
+DROP SAPPHIRE
+DROP CROWN
+GET SAW
+W
+N
+W
+S
+GO SARCOPHAGUS
+D
+GET GLOVE
+S
+GO LADDER
+S
+GO ROPE
+GO STAIRS
+WEAR GLOVE
+if here "Iron glove": GET GLOVE
+if not carrying "wearing an iron glove": WEAR GLOVE
+if here "Iron glove": GET GLOVE
+if not carrying "wearing an iron glove": WEAR GLOVE
+# A poison needle guards the coffer: the iron glove protects you
+UNLOCK COFFER
+if here "Iron glove": GET GLOVE
+if carrying "wearing an iron glove": REMOVE GLOVE
+LOOK COFFER
+GET BRACELET
+# The barred window leads to the top of the pyramid
+SAW BAR
+GO BAR
+GET BAR
+W
+D
+D
+W
+D
+N
+U
+W
+N
+E
+GO ARCHWAY
+E
+DROP BRACELET
+DROP BAR
+SCORE

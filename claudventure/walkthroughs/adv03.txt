@@ -1,0 +1,122 @@
+# Secret Mission - complete solution. Verified with
+#   python3 claudventure/walkthrough.py games/adv03.dat claudventure/walkthroughs/adv03.txt
+# win: completed an IMPOSSIBLE mission
+# Lines starting with '#' are notes. 'if here "X": CMD' means: do CMD only if
+# X is in the room; 'unless said "X": CMD': only if the last message did not
+# say X. There is no score: you defuse the bomb or it goes off. A counter of
+# about 300 turns runs from the start (WAIT uses up 30 of them).
+# About 1 game in 10 still ends in the blast: once the red wire is cut, the
+# bomb can go off at any turn, even on the shortest way to the break room.
+
+# Keep the tape recorder, or someone steals it
+GET TAPE
+W
+S
+# The chair takes photos for security badges. The white button gives one
+# only when the bomb detector is not green: press red first (but never red
+# while it is yellow, or the bomb is armed)
+SIT CHAIR
+PRESS RED
+PRESS WHITE
+GET UP
+GET PICTURE
+N
+W
+GET PAIL
+E
+# The saboteur (a heart patient) drops dead in the grey room, this corridor or the
+# yellow room. Waiting here, he can only fall in the other two
+WAIT
+unless said "dull thud": LOOK
+unless said "dull thud": LOOK
+unless said "dull thud": LOOK
+unless said "dull thud": LOOK
+unless said "dull thud": LOOK
+unless said "dull thud": LOOK
+unless said "dull thud": LOOK
+unless said "dull thud": LOOK
+S
+if here "Dead saboteur": GET SABOTEUR
+N
+D
+N
+if here "Dead saboteur": GET SABOTEUR
+S
+U
+if here "Dead saboteur": GET SABOTEUR
+U
+N
+# The visitor badge opens the white door
+SHOW PICTURE
+DROP SABOTEUR
+FRISK SABOTEUR
+# Throwing the recorder through the window turns the TV camera on: showing the
+# saboteur's badge with the saboteur here turns it off. Going out the window
+# with the camera on sets off the bomb
+BREAK WINDOW
+WITH TAPE
+SHOW PICTURE
+GO WINDOW
+# Never jump from the ledge
+GET KEY
+GO WINDOW
+PRESS WHITE
+S
+D
+S
+# The yellow key unlocks the yellow button: a maintenance badge
+SIT CHAIR
+UNLOCK YELLOW
+PRESS YELLOW
+PRESS WHITE
+GET UP
+GET PICTURE
+DROP PICTURE
+# The maintenance badge opens the yellow door
+N
+D
+N
+SHOW PICTURE
+W
+GET CUTTERS
+# The blue key is inside the mop
+FRISK MOP
+GET KEY
+E
+PRESS YELLOW
+S
+U
+S
+# The blue key unlocks the blue button: a security badge
+SIT CHAIR
+UNLOCK BLUE
+PRESS BLUE
+PRESS RED
+PRESS WHITE
+GET UP
+GET PICTURE
+DROP KEY
+DROP KEY
+# The security badge opens the blue door
+N
+N
+N
+SHOW PICTURE
+# The suit must be worn, not carried, in the reactor core
+W
+WEAR SUIT
+GET WATER
+E
+PUSH HARD
+GO DOOR
+# Radiation ruins the pail, and water spilt in the control room shorts it out:
+# leave the water in the break room
+E
+DROP PAIL
+W
+D
+BREAK WIRE
+GET BOMB
+U
+E
+POUR WATER

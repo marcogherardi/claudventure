@@ -1,0 +1,107 @@
+# Savage Island, Part II - complete solution. Verified with
+#   python3 claudventure/walkthrough.py games/adv11.dat claudventure/walkthroughs/adv11.txt
+# win: finished Savage Island successfully
+# Lines starting with '#' are notes. There is no score.
+# The game opens asking for Part I's password. Only 123 (Part I ended with the
+# pirate's bandanna) can win: the bandanna's glowing threads are needed. 474
+# leaves you without it. The game does not check which password you earned.
+
+# Most of the ship has no air. Breathe out before a vacuum (BREATHE OUT; after
+# HYPERVENTILATE you last longer) and get back to air before you run out
+SAY 123
+HYPERVENTILATE
+BREATHE OUT
+GO FIELD
+E
+S
+W
+W
+GO FIELD
+# A flower in the hydroponics sedates whoever smells it: hold your breath
+# (BREATHE IN) before crushing it next to the caveman you release from his case
+LOOK HYDROPONICS
+LOOK PLANTS
+GET FLOWER
+BREATHE IN
+PUSH BUTTON
+CRUSH FLOWER
+DRAG NEANDERTHAL
+N
+N
+E
+DROP NEANDERTHAL
+W
+# Psychotransfiguration: with the caveman in the next room, FREE readies the
+# console; the bandanna must be worn, or your brain fries. In the caveman's
+# body you can hold your breath much longer. Your old body keeps the bandanna
+SAY FREE
+WEAR BANDANNA
+PUSH BUTTON
+OPEN EYES
+W
+LOOK ME
+GET BANDANNA
+S
+S
+HYPERVENTILATE
+BREATHE OUT
+GO FIELD
+E
+E
+E
+N
+N
+N
+# The blinking light by the force field mesmerizes you: close your eyes
+CLOSE EYES
+GO FIELD
+OPEN EYES
+# The bandanna's thread, tied to the life support lever and to the treadmill,
+# pulls the lever when you run (holding the railing): air everywhere
+UNRAVEL BANDANNA
+TO LEVER
+TO TREADMILL
+GO TREADMILL
+GET RAILING
+RUN
+DROP RAILING
+WALK
+# Tied in a loop, the thread is a portal: from the control room it leads to
+# the engine room, from the first room to the storage hold
+UNTIE BAND
+TO BAND
+GET BAND
+N
+E
+DROP BAND
+GO BAND
+GET DEVICE
+# The engine room console fixes the airlock's force field (until then the
+# room beyond the blinking light sucks you into space once the air is back)
+PUSH BUTTON
+GO HOLE
+GET BAND
+W
+S
+GO FIELD
+S
+S
+S
+W
+N
+W
+# The alien device readies the time machine. The plastic block is a bomb that
+# goes off a few moves after passing the force field: sent back in time, it
+# wipes out the dinosaurs
+MOVE RED
+GET BLOCK
+GO FIELD
+DROP BLOCK
+GO FIELD
+PUSH BUTTON
+DROP BAND
+GO BAND
+# The device's blue switch wakes the robot pirate, who carries you to the
+# display case; its button ends the game
+MOVE BLUE
+PUSH BUTTON

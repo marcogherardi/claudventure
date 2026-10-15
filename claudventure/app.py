@@ -396,7 +396,10 @@ class Session:
         if walk_path.exists():
             walkthrough = ("# Solution (secret: only for graded hints)\n\n"
                            "A verified sequence of commands that wins the game. Random events can "
-                           "require small detours. Lines starting with # are notes.\n\n"
+                           "require small detours. Lines starting with # are notes; '? CMD' is only "
+                           "needed in some cases; 'if here \"X\": CMD' (or 'if carrying', 'if said', "
+                           "'unless ...') is done only when X is in the room, carried, or in the "
+                           "last message (or, for unless, when it is not).\n\n"
                            + walk_path.read_text())
         else:
             walkthrough = ("# Solution\n\nNo verified walkthrough is available for this game: work "
@@ -430,9 +433,9 @@ class Session:
             lines.append("Visible here: " + (", ".join(st["items_here"]) or "nothing"))
         lines.append("Carrying: " + (", ".join(st["inventory"]) or "nothing")
                      + f" ({len(st['inventory'])}/{g.max_carry})")
-        light = (f"lamp lit, {st['light_time']} turns of light left" if st["lamp_lit"]
-                 else "no lit light source")
-        lines.append(f"Turn {st['turn']}; {light}")
+        light = (f"; light on, {st['light_time']} turns of light left" if st["lamp_lit"]
+                 else "; no lit light source") if g.has_darkness else ""
+        lines.append(f"Turn {st['turn']}{light}")
         if st["treasures_total"]:
             lines.append(f"Treasures stored: {st['treasures_stored']} of {st['treasures_total']}")
         moved = []

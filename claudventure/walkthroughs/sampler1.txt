@@ -1,0 +1,38 @@
+# Adventureland sampler - complete solution (3 treasures). Verified with
+#   python3 claudventure/walkthrough.py games/sampler1.dat claudventure/walkthroughs/sampler1.txt
+# Lines starting with '#' are notes; lines starting with '?' are only needed
+# in some cases (harmless otherwise).
+
+# Blue ox: the magic word BUNYON (written on the axe) sends axe and ox to the grove
+E
+E
+GET AXE
+N
+SAY BUNYON
+# Swimming out of the bog only works carrying nothing
+SWIM
+W
+S
+# Carrying mud keeps the chiggers off (and cures their bites); the dragon
+# in the meadow smells it, so pick it up only after passing him
+GET MUD
+W
+GET AXE
+GET OX
+GET FRUIT
+E
+CLIMB TREE
+# Never take the spider web (deadly). Take the keys BEFORE chopping the tree
+GET KEYS
+D
+? GET MUD
+CHOP TREE
+GO STUMP
+# The stump is the treasure room
+DROP OX
+DROP FRUIT
+D
+GET RUBIES
+U
+DROP RUBIES
+SCORE

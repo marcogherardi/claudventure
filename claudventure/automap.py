@@ -6,6 +6,7 @@ geometric: passages that do not fit the grid, loops and magic transports are
 listed under the map instead of drawn.
 """
 
+import re
 from collections import deque
 from typing import Dict, List, Optional, Tuple
 
@@ -66,10 +67,10 @@ class AutoMap:
         """Exits the player knows about (they are only shown in the light)."""
         return self.game.rooms[room].exits if self.seen.get(room) else [0] * 6
 
-    def _layout(self) -> Dict[int, Tuple[int, int, int]]:
+    def _area(self, start: int, free: set) -> Dict[int, Tuple[int, int, int]]:
+        """Grid positions, relative to start, of the rooms in free joined to it by exits."""
         pos: Dict[int, Tuple[int, int, int]] = {}
         taken: Dict[Tuple[int, int, int], int] = {}
-        visited = set(self.order)
 
         def place(room, want):
             cell = want
@@ -79,39 +80,60 @@ class AutoMap:
                 ring = [(want[0] + dx, want[1] + dy, want[2])
                         for dx in range(-radius, radius + 1) for dy in range(-radius, radius + 1)
                         if max(abs(dx), abs(dy)) == radius]
-                free = [c for c in ring if c not in taken]
-                if free:
-                    cell = free[0]
+                cells = [c for c in ring if c not in taken]
+                if cells:
+                    cell = cells[0]
             pos[room] = cell
             taken[cell] = room
 
+        place(start, (0, 0, 0))
+        queue = deque([start])
+        while queue:
+            r = queue.popleft()
+            x, y, z = pos[r]
+            for d in range(6):
+                targets = []
+                t = self._exits(r)[d]
+                if t in free and t not in pos:
+                    targets.append(t)
+                for other in free:  # rooms whose exits lead here
+                    if other not in pos and self._exits(other)[OPPOSITE[d]] == r:
+                        targets.append(other)
+                for room in targets:
+                    if room not in pos:
+                        dx, dy, dz = DELTA[d]
+                        place(room, (x + dx, y + dy, z + dz))
+                        queue.append(room)
+        return pos
+
+    def _layout(self) -> Dict[int, Tuple[int, int, int]]:
+        pos: Dict[int, Tuple[int, int, int]] = {}
+        visited = set(self.order)
         for start in self.order:
             if start in pos:
                 continue
-            # a new area, not joined by exits: next to the place it was reached from, if known
-            src = next((a for a, _, b in self.links if b == start and a in pos), None)
-            if src is not None:
-                x, y, z = pos[src]
-                place(start, (x + 1, y, z))
+            # A new area, not joined by exits to the places seen so far: drawn on its own,
+            # then set next to the place it was reached from (on that level after CLIMB
+            # TREE or JUMP, on level 0 after a magic word), with a blank cell around it
+            area = self._area(start, visited - set(pos))
+            link = next(((a, cmd) for a, cmd, b in self.links if b == start and a in pos), None)
+            if link is not None:
+                x, y, z = pos[link[0]]
+                magic = self.game.parse_command(link[1])[0] == self.game.which_word("SAY", self.game.verbs)
+                x, z = x + 2, (0 if magic else z)
             else:
-                right = max((p[0] for p in pos.values()), default=-2) + 2
-                place(start, (right, 0, 0))
-            queue = deque([start])
-            while queue:
-                r = queue.popleft()
-                x, y, z = pos[r]
-                for d in range(6):
-                    targets = []
-                    t = self._exits(r)[d]
-                    if t in visited and t not in pos:
-                        targets.append((t, DELTA[d]))
-                    for other in visited:  # rooms whose exits lead here
-                        if other not in pos and self._exits(other)[OPPOSITE[d]] == r:
-                            targets.append((other, DELTA[d]))
-                    for room, (dx, dy, dz) in targets:
-                        if room not in pos:
-                            place(room, (x + dx, y + dy, z + dz))
-                            queue.append(room)
+                x, y, z = (max((p[0] for p in pos.values()), default=-2) + 2, 0, 0)
+            near = {(px + dx, py + dy, pz) for px, py, pz in pos.values()
+                    for dx in (-1, 0, 1) for dy in (-1, 0, 1)}
+            for shift in range(200):
+                for dy in (0, 1, -1, 2, -2):
+                    cells = {r: (ax + x + shift, ay + y + dy, az + z) for r, (ax, ay, az) in area.items()}
+                    if not near & set(cells.values()):
+                        break
+                else:
+                    continue
+                break
+            pos.update(cells)
         return pos
 
     # drawing ---------------------------------------------------------------------
@@ -167,8 +189,15 @@ class AutoMap:
                         grid[y * 2 + 1][x * CELL + 1] = "│"  # under the first digit
             title = "Level 0 (where you started)" if z == 0 else f"Level {z:+d}" + (
                 " (up)" if z > 0 else " (down)")
-            drawings.append((z, title, ["".join(row).rstrip() for row in grid
-                                        if "".join(row).strip()]))
+            # rows of places with their connector rows; a blank connector row stays, so
+            # that places one above the other but not joined do not look joined
+            lines = []
+            for i in range(0, len(grid), 2):
+                if "".join(grid[i]).strip():
+                    lines += ["".join(grid[i]).rstrip(), "".join(grid[i + 1]).rstrip()]
+            while lines and not lines[-1]:
+                lines.pop()
+            drawings.append((z, title, lines))
         return drawings, drawn, pos, num
 
     def render(self, current: int, width: int = 86) -> str:
@@ -223,15 +252,17 @@ class AutoMap:
         drawings, _, pos, num = self._draw(current)
         z = pos[current][2]
         title, lines = next((t, l) for zz, t, l in drawings if zz == z)
-        names = [f"{num[r]} {scott.place_name(self.game.rooms[r].text, 22) if self.seen[r] else '(dark)'}"
-                 for r in self.order if pos[r][2] == z]
+        names = {r: f"{num[r]} {scott.place_name(self.game.rooms[r].text, 22) if self.seen[r] else '(dark)'}"
+                 for r in self.order if pos[r][2] == z}
         room_rows = max(1, height - min(len(names), height // 2))
         row = next(i for i, l in enumerate(lines) if "<" in l)
         col = lines[row].index("<")
         top = max(0, min(row - room_rows // 2, len(lines) - room_rows))
         left = max(0, min(col - width // 2, max(len(l) for l in lines) - width))
         view = [l[left:left + width] for l in lines[top:top + room_rows]]
-        legend = [_clip(n, width) for n in names][:max(0, height - len(view) - 1)]
+        shown = {int(n) for l in view for n in re.findall(r"[\[<](\d+)", l)}
+        legend = [_clip(n, width) for r, n in names.items() if num[r] in shown]
+        legend = legend[:max(0, height - len(view) - 1)]
         return title, view + ([""] + legend if legend else [])
 
 

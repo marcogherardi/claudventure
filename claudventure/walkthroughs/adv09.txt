@@ -1,0 +1,225 @@
+# Ghost Town - complete solution (13 treasures). Verified with
+#   python3 claudventure/walkthrough.py games/adv09.dat claudventure/walkthroughs/adv09.txt
+# Lines starting with '#' are notes. 'if here "X": CMD' means: do CMD only if
+# X is in the room ('carrying': carried; 'not' reverses it).
+# The treasure room is the Dry Goods store. The sun sets after about 170
+# moves; the silver cup can only be won at night. Sleeping anywhere but in a
+# bed is deadly (this solution never sleeps).
+
+# The Stetson hat hides a small key
+GO BARBERSHOP
+GET HAT
+SHAKE HAT
+GET KEY
+DROP HAT
+S
+W
+GO STORE
+GET SHOVEL
+GET MATCHES
+N
+W
+W
+# Saltpeter in the manure; the spurs make 'Ole Paint buck and kick a hole into
+# the storeroom, where the keg of nails is
+GO STABLE
+DIG MANURE
+GET CRYSTALS
+GO STALL
+GET HORSESHOE
+GO PAINT
+GET SPURS
+SPUR HORSE
+GET UP
+GO STALL
+GO HOLE
+EMPTY KEG
+GET NAILS
+N
+S
+S
+E
+E
+GO STORE
+DROP SPURS
+DROP CRYSTALS
+N
+E
+# The jail door is bolted from inside: the horseshoe is a magnet
+OPEN DOOR
+WITH HORSESHOE
+GO JAIL
+GET DERRINGER
+OPEN DOOR
+GO DOOR
+GET HAMMER
+N
+DROP KEY
+N
+E
+E
+# The golden derringer is a water pistol: enough for the rattlesnake.
+# Never cover the snake with the hat
+SHOOT SNAKE
+DIG
+GO GRAVE
+GET COIN
+KILL WORM
+U
+W
+W
+W
+GO STORE
+DROP DERRINGER
+DROP COIN
+N
+W
+W
+GO STABLE
+GO STALL
+# Shod with horseshoe, nails and hammer, 'Ole Paint obeys GIDDYAP
+SHOE HORSE
+DROP HAMMER
+GO PAINT
+SAY GIDDYAP
+GO TEEPEE
+GET TOM
+GET NECKLACE
+# The tom tom calls an Indian ghost: say HOW and he sends you home
+HIT TOM
+SAY HOW
+GET UP
+GO STALL
+GO HOLE
+GET KEG
+N
+S
+S
+E
+E
+GO STORE
+DROP TOM
+DROP NECKLACE
+GET CRYSTALS
+N
+W
+W
+W
+W
+N
+# Gunpowder: saltpeter, sulfur (dug up in the field) and charcoal (in the
+# ravine, once the brush there is burnt)
+DIG
+GET POWDER
+S
+S
+BURN BRUSH
+GO RAVINE
+MIX POWDER
+WITH GUNPOWDER
+# Never carry the gunpowder with a lit candle. The candle is in the mine
+GO MINE
+D
+GET CANDLE
+BURN CANDLE
+S
+# "Its mine, dig roof!" (the map in the saloon piano)
+DIG ROOF
+GET NUGGET
+N
+U
+GET BULLET
+U
+# At night ghosts square dance in the saloon, but only in the dark: dance
+# with them for the silver cup
+UNLIGHT CANDLE
+GET KEG
+U
+N
+E
+E
+E
+# Leave the keg of gunpowder by the safe and splice the wires: the telegraph
+# key in the line shack, across the ravine, sets it off from a safe distance
+GO TELEGRAPH
+MOVE SAFE
+CONNECT WIRE
+DROP KEG
+S
+W
+W
+W
+S
+JUMP RAVINE
+W
+GO SHACK
+MOVE KEY
+LOOK FLOOR
+GET PLANK
+DROP PLANK
+GO HOLE
+GET PELTS
+U
+S
+E
+JUMP RAVINE
+N
+E
+E
+E
+# The blast throws the open safe into the street
+LOOK SAFE
+GET BAG
+E
+GO STORE
+DROP NUGGET
+DROP BULLET
+DROP PELTS
+DROP BAG
+DROP SHOVEL
+BURN CANDLE
+N
+GO SALOON
+GET BELL
+S
+W
+GO HOTEL
+GO COUNTER
+GET CASHBOX
+N
+E
+# "Ring for ROOM service": the bell brings a bed, and under it a roll of tape.
+# Taped, the saloon mirror breaks safely and shows a hole
+HIT BELL
+DROP BELL
+MOVE BED
+GET TAPE
+if carrying "Unlit candle": BURN CANDLE
+W
+N
+E
+GO SALOON
+TAPE MIRROR
+DROP TAPE
+BREAK MIRROR
+GO HOLE
+GET GO
+# Pass GO, collect $200
+PASS GO
+GET $200
+E
+UNLIGHT CANDLE
+if not here "square dance": WAIT
+if not here "square dance": WAIT
+if not here "square dance": WAIT
+if not here "square dance": WAIT
+if not here "square dance": WAIT
+if not here "square dance": WAIT
+DANCE
+S
+GO STORE
+DROP CASHBOX
+DROP GO
+DROP $200
+DROP CUP
+SCORE

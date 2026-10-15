@@ -1,31 +1,93 @@
 """Play a walkthrough file through the real engine and report how it went.
 
-    python3 claudventure/walkthrough.py games/adv01.dat claudventure/walkthroughs/adv01.txt [--seeds N] [-v]
+    python3 claudventure/walkthrough.py games/adv01.dat claudventure/walkthroughs/adv01.txt [--seeds N] [--seed FIRST] [-v] [--map]
+
+The game is won when the engine prints "Well done" (all treasures stored), or
+the text given in the walkthrough by a line like '# win: You have saved the
+world'. --map draws the map of the places visited, as the player would see it.
+
+Line formats: 'CMD' must work; '? CMD' is only needed in some cases (its
+warnings are ignored); 'if here "X": CMD' runs CMD only when an item whose name
+contains X is in the room ('carrying "X"': carried, 'said "X"': in the last
+command's output). Conditions can be negated with 'not' and joined with 'and'
+('if not carrying "Postcard" and not said "DING-DONG": LOOK'); 'unless C' is
+'if not C'. These handle the games' random events.
 """
 
+import re
 import sys
+from pathlib import Path
 
+import scott
+from automap import AutoMap
 from engine import Engine
 
-WARN = ("dead", "can't", "beyond my power", "don't understand", "too much",
-        "don't know", "nothing to light", "what ?", "dangerous", "not here")
+WARN = ("dead", "can't do", "can't go", "sorry i can't", "beyond my power", "don't understand",
+        "too much", "don't know", "nothing to light", "what ?", "dangerous", "not here",
+        "don't see", "won't let me", "won't fit", "something is missing")
+
+
+COND = re.compile(r'^(if|unless) (.+?):\s*([A-Z0-9].*)$', re.I)
+TEST = re.compile(r'^(not )?(here|carrying|said) "([^"]+)"$', re.I)
 
 
 def commands(path):
+    """(command, optional, conditions) for each line; conditions: [(negated, kind, text)]."""
     for line in open(path):
         line = line.strip()
-        if line and not line.startswith("#"):
-            optional = line.startswith("?")
-            yield line.lstrip("? ").strip(), optional
+        if not line or line.startswith("#"):
+            continue
+        m = COND.match(line)
+        if m:
+            tests = [TEST.match(t.strip()) for t in m.group(2).split(" and ")]
+            if not all(tests):
+                raise ValueError(f"bad condition: {line}")
+            unless = m.group(1).lower() == "unless"
+            yield m.group(3).strip(), True, [(bool(t.group(1)) != unless, t.group(2).lower(),
+                                              t.group(3).lower()) for t in tests]
+        else:
+            yield line.lstrip("? ").strip(), line.startswith("?"), None
+
+
+def holds(conds, state, last):
+    for negated, kind, text in conds:
+        if kind == "said":
+            found = text in last.lower()
+        else:
+            items = state.get("items_here" if kind == "here" else "inventory", [])
+            found = any(text in i.lower() for i in items)
+        if found == negated:
+            return False
+    return True
+
+
+def win_text(path):
+    for line in open(path):
+        if line.lower().startswith("# win:"):
+            return line.split(":", 1)[1].strip().lower()
+    return "well done"
 
 
 def run(game, walk, seed, verbose):
     eng = Engine(game, seed=seed)
     t = eng.start()
+    amap = AutoMap(scott.load(game))
+    amap.observe(t.state)
     problems = []
-    for n, (cmd, optional) in enumerate(commands(walk), 1):
+    won = False
+    goal = win_text(walk)
+    last = t.text
+    for n, (cmd, optional, cond) in enumerate(commands(walk), 1):
+        if cond and not holds(cond, t.state, last):
+            continue
+        before = t.state.get("room")
         t = eng.send(cmd)
+        amap.observe(t.state, cmd, before)
+        if not t.state.get("game_over"):
+            amap.level_view(t.state["room"], 38, 20)  # what the side panel draws
+        last = t.text + "\n" + "\n".join(t.looks)
         out = t.text.lower()
+        won |= goal in out
         if verbose:
             print(f"> {cmd}\n{t.text}\n  [room {t.state['room']} carry {len(t.state['inventory'])} "
                   f"light {t.state['light_time']} stored {t.state['treasures_stored']}]")
@@ -33,27 +95,34 @@ def run(game, walk, seed, verbose):
         if (hits and not optional) or t.state.get("unknown_word"):
             problems.append(f"{n}:{cmd}: {t.text.strip()[:80]!r}")
         if t.state.get("game_over"):
+            if not won:
+                problems.append(f"{n}:{cmd}: game over: {' '.join(t.text.split())[-90:]!r}")
             break
     eng.close()
-    won = "well done" in t.text.lower()
-    return won, t.state, problems
+    return won, t.state, problems, amap
 
 
 def main(argv):
     args = [a for a in argv[1:] if not a.startswith("-")]
     verbose = "-v" in argv
     seeds = int(argv[argv.index("--seeds") + 1]) if "--seeds" in argv else 1
-    if "--seeds" in argv:
-        args.remove(str(seeds))
+    first = int(argv[argv.index("--seed") + 1]) if "--seed" in argv else 1
+    for opt in ("--seeds", "--seed"):
+        if opt in argv:
+            args.remove(argv[argv.index(opt) + 1])
     game, walk = args
+    game = str(Path(game).resolve())  # the engine runs from the project root
     wins = 0
-    for seed in range(1, seeds + 1):
-        won, state, problems = run(game, walk, seed, verbose and seeds == 1)
+    for seed in range(first, first + seeds):
+        won, state, problems, amap = run(game, walk, seed, verbose and seeds == 1)
         wins += won
         print(f"seed {seed}: {'WON' if won else 'not won'} turn {state.get('turn')} "
               f"stored {state.get('treasures_stored')}/{state.get('treasures_total')} light {state.get('light_time')}")
         for p in problems:
             print("   ", p)
+    if "--map" in argv:
+        print()
+        print(amap.render(state.get("room"), width=110))
     print(f"{wins}/{seeds} won")
     return 0 if wins == seeds else 1
 

@@ -1,0 +1,175 @@
+# Strange Odyssey - complete solution (5 treasures). Verified with
+#   python3 claudventure/walkthrough.py games/adv06.dat claudventure/walkthroughs/adv06.txt
+# Lines starting with '#' are notes. 'if not said "X": CMD' means: do CMD
+# only if the last message did not say X.
+# The suit holds about 110 moves of air: wear it outside, open it where the
+# air is good (READ GAUGE tells). The phaser has charge for 4 shots on
+# destroy (stun uses about half as much).
+# About 3 games in 10 still end badly: the Ice Hound can attack the moment you
+# walk in on it, in the zoo and inside the ice mound.
+
+D
+WEAR SUIT
+GET PHASER
+GET SHOVEL
+SET PHASER
+TO DESTROY
+# Out through the airlock; the gravity outside is weak enough to jump down
+U
+PUSH RED
+GO DOOR
+PUSH RED
+GO DOOR
+JUMP
+S
+# Behind the boulder, a curtain of light leads to a hexagonal room
+GO CAVE
+SHOOT BOULDER
+GO CURTAIN
+# The hexagonal room is a teleporter: touching the plastic with the rod pushed
+# in sets the curtain to the place numbered by how many times the rod went in
+# (it starts at 2). Touching it with the rod out resets the count to 0.
+# 1 cavern, 2 grassy plain, 3 snow storm, 4 derelict ship (refills air),
+# 5 black hole (deadly), 6 art museum, 7 mining colony (crushing gravity)
+TOUCH PLASTIC
+GO CURTAIN
+# Digging in the grassy plain turns up an ice pick
+DIG
+GET PICK
+DROP SHOVEL
+# The Ice Hound must be stunned, never killed. Never walk into the slime trees
+SET PHASER
+TO STUN
+GO JUNGLE
+E
+SHOOT HOUND
+GET HOUND
+S
+W
+GO CURTAIN
+# In the snow storm the hound, waking up, burrows into an ice mound
+PULL ROD
+PUSH ROD
+TOUCH PLASTIC
+GO CURTAIN
+DROP HOUND
+if not said "burrows off": LOOK
+if not said "burrows off": LOOK
+if not said "burrows off": LOOK
+if not said "burrows off": LOOK
+if not said "burrows off": LOOK
+if not said "burrows off": LOOK
+if not said "burrows off": LOOK
+if not said "burrows off": LOOK
+if not said "burrows off": LOOK
+if not said "burrows off": LOOK
+if not said "burrows off": LOOK
+if not said "burrows off": LOOK
+# The pick gets you into the mound, where the diamond is; stun the hound at
+# once, then blast your way out
+W
+DIG MOUND
+SHOOT HOUND
+GET DIAMOND
+DROP PICK
+SET PHASER
+TO DESTROY
+SHOOT MOUND
+E
+GO CURTAIN
+# The hexagonal room has good air
+OPEN SUIT
+DROP DIAMOND
+DROP PHASER
+PULL ROD
+PUSH ROD
+PULL ROD
+PUSH ROD
+PULL ROD
+PUSH ROD
+TOUCH PLASTIC
+CLOSE SUIT
+GO CURTAIN
+# The sculpture wears an alien belt: worn and with its buckle twisted, it
+# cancels gravity, needed in the mining colony
+GET PAINTING
+GET SCULPTURE
+GET BELT
+WEAR BELT
+BEND BUCKLE
+GO CURTAIN
+OPEN SUIT
+DROP PAINTING
+DROP SCULPTURE
+PULL ROD
+PUSH ROD
+TOUCH PLASTIC
+CLOSE SUIT
+GO CURTAIN
+GET FLASK
+GO CURTAIN
+DROP FLASK
+GO CURTAIN
+# The twisted metal pries open the hatch in the storage hold
+GET METAL
+GO CURTAIN
+OPEN SUIT
+# The rod, broken off, replaces the scoutship's power crystal: set the
+# teleporter to the cavern first, it cannot be changed afterwards
+BEND BUCKLE
+DROP BELT
+PULL ROD
+TOUCH PLASTIC
+PUSH ROD
+TOUCH PLASTIC
+BEND ROD
+GET DIAMOND
+GET FLASK
+CLOSE SUIT
+GO CURTAIN
+U
+N
+GO SHIP
+PUSH RED
+GO DOOR
+OPEN SUIT
+DROP DIAMOND
+DROP FLASK
+D
+OPEN HATCH
+DROP METAL
+GO CRAWLWAY
+DROP ROD
+U
+U
+CLOSE SUIT
+GO DOOR
+PUSH RED
+GO DOOR
+JUMP
+S
+GO CAVE
+GO CURTAIN
+GET PAINTING
+GET SCULPTURE
+GET BELT
+GO CURTAIN
+U
+N
+GO SHIP
+PUSH RED
+GO DOOR
+# The scoutship flies to the mother ship; its storage hold is the treasure room
+PUSH BLUE
+DROP SUIT
+GET DIAMOND
+GET FLASK
+GO DOOR
+PUSH RED
+GO DOOR
+DROP DIAMOND
+DROP FLASK
+DROP PAINTING
+DROP SCULPTURE
+DROP BELT
+SCORE

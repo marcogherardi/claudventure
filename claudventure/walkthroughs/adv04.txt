@@ -1,0 +1,114 @@
+# Voodoo Castle - complete solution. Verified with
+#   python3 claudventure/walkthrough.py games/adv04.dat claudventure/walkthroughs/adv04.txt
+# win: Look who is in the room
+# Lines starting with '#' are notes. There is no score: lifting Count
+# Cristo's curse wins the game.
+
+# Count Cristo lies cursed in the coffin
+OPEN COFFIN
+E
+GET KNIFE
+W
+W
+# The dusty idol, once dusted, glows: the castle's light
+GO FIREPLACE
+GET IDOL
+DUST IDOL
+OPEN FLUE
+S
+E
+S
+W
+S
+E
+# The shield protects from the exploding test tubes in the lab
+GET SHIELD
+GET SWORD
+W
+N
+E
+E
+N
+# The sword pries the animal heads off the wall: behind them, a safe
+# (combination 38 33, written in glowing letters on the plaque)
+GET HEADS
+TURN 38
+TURN 33
+GET HAMMER
+DROP SWORD
+DROP HEADS
+E
+E
+# The chemicals shrink you to 4 feet: the tiny door in the torture
+# chamber becomes a way through
+MIX CHEMICALS
+DRINK CHEMICALS
+W
+W
+S
+W
+W
+S
+GO DOOR
+# The four leaf clover keeps the window open and is needed at the end
+GET CLOVER
+GET SAW
+E
+N
+E
+E
+# A hole under the kettle
+MOVE KETTLE
+GO HOLE
+GET FOOT
+U
+W
+N
+W
+# Never carry the soot through the ballroom
+GO FIREPLACE
+GO FLUE
+GET NAILS
+GET BOARDS
+SAW GRATING
+DROP SAW
+DROP HAMMER
+DROP NAILS
+DROP BOARDS
+DROP GRATING
+PRESS BUTTON
+# The chimney sweep's paper: "SAY ZAP to restore someone changed to stone!"
+PUSH SWEEP
+READ PAPER
+DROP PAPER
+D
+D
+S
+E
+S
+GO STAIRS
+# ZAP brings the Ju-Ju man statue to life; his bag then comes off the lab floor
+SAY ZAP
+D
+E
+N
+E
+E
+GET BAG
+GET STICK
+W
+W
+S
+W
+N
+N
+GO WINDOW
+GET DOLL
+S
+S
+# The ritual: give the Count his rabbit's foot, circle the coffin with the
+# knife and the glowing idol, wave the stick holding the doll, yell CHANT
+ON MAN
+CIRCLE COFFIN
+WAVE STICK
+YELL CHANT

@@ -11,7 +11,7 @@ from textual import work
 from textual.app import App, ComposeResult
 from textual.binding import Binding
 from textual.color import Color
-from textual.containers import Horizontal, Vertical, VerticalScroll
+from textual.containers import Horizontal, ScrollableContainer, Vertical, VerticalScroll
 from textual.screen import ModalScreen
 from textual.widgets import Input, Static
 
@@ -97,7 +97,7 @@ class MapScreen(ModalScreen):
         self.text = text
 
     def compose(self) -> ComposeResult:
-        body = Text()
+        body = Text(no_wrap=True)  # the drawing must not wrap: it scrolls sideways instead
         for line in self.text.split("\n"):
             if line.startswith("Level "):
                 body.append(line + "\n", style="bold")
@@ -110,10 +110,10 @@ class MapScreen(ModalScreen):
                 body.append(line[end + 1:] + "\n")
             else:
                 body.append(line + "\n")
-        with VerticalScroll(id="fullmap") as box:
+        with ScrollableContainer(id="fullmap") as box:
             box.border_title = "Map"
             box.border_subtitle = "Esc to close"
-            yield Static(body)
+            yield Static(body, id="fullmap-body")
 
 
 class Claudventure(App):
@@ -134,6 +134,7 @@ class Claudventure(App):
     #status { height: 1; padding: 0 1; color: $text-muted; }
     MapScreen { align: center middle; }
     #fullmap { width: 90%; height: 90%; border: round $pastel-accent; padding: 0 1; background: $surface; }
+    #fullmap-body { width: auto; }
     #story, #fullmap {
         scrollbar-background: $surface; scrollbar-background-hover: $surface;
         scrollbar-background-active: $surface; scrollbar-color: $pastel-secondary 45%;
@@ -315,7 +316,8 @@ class Claudventure(App):
         if st["treasures_total"]:
             score.append(f"Treasures {st['treasures_stored']}/{st['treasures_total']}")
         score.append(f"Turn {st['turn']}")
-        score.append("Lamp lit" if st["lamp_lit"] else "No light")
+        if g.has_darkness:
+            score.append("Light on" if st["lamp_lit"] else "No light")
         self.query_one("#score", Static).update(" · ".join(score))
 
     def on_resize(self, event):

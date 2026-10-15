@@ -1,0 +1,218 @@
+# The Golden Voyage - complete solution. Verified with
+#   python3 claudventure/walkthrough.py games/adv12.dat claudventure/walkthroughs/adv12.txt
+# win: Mission accomplished
+# Lines starting with '#' are notes. 'if here "X": CMD' means: do CMD only if
+# X is in the room. You win by bringing the King the right water of youth.
+# About half the games are still lost on the way back from the fountain: the
+# blinded cyclops staggers about and can step on you as you pass.
+# The King has 3 days (a day is about 215 moves, and only ends when you sleep):
+# this solution never sleeps. Sleep only in the ship's cot, or catch pneumonia.
+# Several places are dark (and so is the night): a torch is buried in the
+# jungle and flint & steel lie on the staircase, but you can also move in the
+# dark through exits you know.
+
+# The King's gold buys from every merchant (BUY), without paying it away
+W
+N
+GO PALACE
+GET BAG
+E
+S
+BUY COMPASS
+GET COMPASS
+BUY TELESCOPE
+GET TELESCOPE
+BUY TABLET
+GET TABLET
+E
+BUY SANDALS
+GET SANDALS
+# Sandals keep off the scorpions found wherever you land
+WEAR SANDALS
+W
+W
+BUY SHIP
+GO SHIP
+DROP BAG
+DROP COMPASS
+DROP TELESCOPE
+# The compass tells directions at sea (it can lie on the deck). From the
+# city: west, the island; south, the rocky strand; east twice, the sandy
+# beach. Look through the telescope from the crow's-nest to sight land, and
+# drop anchor before going ashore, or the ship drifts away
+RAISE ANCHOR
+SAIL WEST
+GET TELESCOPE
+GO MAST
+EXAM TELESCOPE
+D
+DROP TELESCOPE
+DROP ANCHOR
+GO ISLAND
+W
+GET SHOVEL
+E
+N
+GO MOUNTAIN
+GET SWORD
+D
+S
+GO SHIP
+DROP SWORD
+RAISE ANCHOR
+SAIL EAST
+SAIL EAST
+SAIL EAST
+GET TELESCOPE
+GO MAST
+EXAM TELESCOPE
+D
+DROP TELESCOPE
+DROP ANCHOR
+GO BEACH
+# Dig the jungle for a rope, a torch and a broken stone. The tablet with the
+# picture of a cave belongs in the fountain in the damp cave
+GO JUNGLE
+DIG
+GET ROPE
+N
+DIG
+DIG
+GET STONE
+GO CAVE
+IN FOUNTAIN
+W
+S
+W
+GO SHIP
+DROP ROPE
+GET SWORD
+RAISE ANCHOR
+SAIL WEST
+SAIL WEST
+SAIL SOUTH
+GET TELESCOPE
+GO MAST
+EXAM TELESCOPE
+D
+DROP TELESCOPE
+DROP ANCHOR
+# The Stone Goddess comes to life and follows you, sword swinging (your own
+# sword fends it off): push it down the staircase
+GO STRAND
+if here "Stone Goddess": LOOK
+if here "Stone Goddess": LOOK
+if here "Stone Goddess": LOOK
+if here "Stone Goddess": LOOK
+if here "Stone Goddess": LOOK
+if here "Stone Goddess": LOOK
+if here "Stone Goddess": LOOK
+if here "Stone Goddess": LOOK
+if here "Stone Goddess": LOOK
+if here "Stone Goddess": LOOK
+if here "Stone Goddess": LOOK
+if here "Stone Goddess": LOOK
+if here "Stone Goddess": LOOK
+if here "Stone Goddess": LOOK
+if here "Stone Goddess": LOOK
+GO STAIRS
+PUSH STATUE
+DROP SWORD
+STEP DOWN
+# Another broken stone in the rubble; a key buried in the grassy plain opens
+# the chest in the temple, which holds a gold mask. The chalice is on the altar
+EXAM RUBBLE
+GET STONE
+S
+DIG
+GET KEY
+DROP SHOVEL
+N
+GO STAIRS
+STEP UP
+W
+EXAM ALTAR
+GET CHALICE
+# Praying in the temple shows a hidden passage
+PRAY
+N
+OPEN CHEST
+DROP KEY
+EXAM CHEST
+GET MASK
+S
+GO PASSAGE
+W
+GET STONE
+# The three broken stones unite into a tablet: a mountain and the word SUN
+DROP STONE
+DROP STONE
+DROP STONE
+GET TABLET
+E
+N
+E
+GO STAIRS
+STEP DOWN
+GO SHIP
+RAISE ANCHOR
+SAIL WEST
+SAIL NORTH
+DROP ANCHOR
+GO ISLAND
+N
+# On the island, SUN opens a crevice to a fountain: the second tablet goes in
+# there. With both tablets in their fountains the ground shakes, a hallway
+# opens beyond the hidden chamber, and the fountain gives up a white globe
+SAY SUN
+GO CREVICE
+IN FOUNTAIN
+EXAM FOUNTAIN
+GET GLOBE
+GO CREVICE
+S
+GO SHIP
+GET ROPE
+RAISE ANCHOR
+SAIL SOUTH
+SAIL EAST
+DROP ANCHOR
+GO STRAND
+GO STAIRS
+STEP UP
+W
+GO PASSAGE
+GO HALLWAY
+E
+# The rope, tied to the stalagmite, leads down the pit
+TIE ROPE
+TO STALAGMITE
+IN PIT
+GO ROPE
+# The globe, dropped, flashes and blinds the cyclops: wear the gold mask or it
+# blinds you too. Never step into a fountain. The magnificent fountain's
+# water restores youth (the ocean's and the strange fountain's do not)
+WEAR MASK
+S
+DROP GLOBE
+GO CAVE
+W
+FILL CHALICE
+E
+N
+N
+GO ROPE
+W
+N
+N
+E
+GO STAIRS
+STEP DOWN
+GO SHIP
+RAISE ANCHOR
+SAIL NORTH
+GO CITY
+E
+N
+GO PALACE
+GIVE CHALICE

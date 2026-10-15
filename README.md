@@ -60,7 +60,7 @@ from, and about how heavy you are right now.
 - **Undo, save, load.** `/undo` takes back your last message, even after a fatal mistake. `/save` and `/load` keep named saves, and quitting saves automatically.
 - **Token and quota meter.** The status line shows the tokens used and your Claude subscription quota (5-hour and weekly windows). `/usage` gives the breakdown.
 - **All 18 games.** Each game file is decoded into a complete guide for the narrator: vocabulary with synonyms, map, items, and every rule of the game logic in readable form, including the original authors' comments.
-- **A verified solution for Adventureland.** It completes the game with all 13 treasures on the real engine in 32 of 50 random-seed runs. The other runs die of the game's own random hazards (bees, chiggers).
+- **Verified solutions for 13 of the 18 games.** Each one is played to the end on the real engine over hundreds of random seeds; the narrator keeps it secret and uses it only for graded hints. Where a solution sometimes fails, it is because of the game's own random hazards, and the solution's notes say so (see [The games](#the-games)).
 - **Plain game commands skip the interpretation step.** Typing `n`, `i`, `get axe` or `climb tree` sends the command straight to the engine, and Claude only narrates the outcome: one request instead of two. Use `--always-interpret` to let Claude interpret everything.
 - **No API key.** Claudventure drives Claude Code in non-interactive mode, so it runs on your Claude subscription.
 
@@ -82,7 +82,7 @@ from, and about how heavy you are right now.
          Claude narrates ──► streamed to your terminal
 ```
 
-- **Engine.** [ScottFree](src/README) is the 1990s GPL interpreter for the Scott Adams TRS-80 data files. It got a small patch: with `-j` it reads stdin and writes stdout instead of drawing with curses, prints a JSON snapshot of the game state every turn, and accepts `#save`, `#load` and `#look` from the front end. Without `-j` it works exactly as before (`./play.sh`).
+- **Engine.** [ScottFree](src/README) is the 1990s GPL interpreter for the Scott Adams TRS-80 data files. It got a small patch: with `-j` it reads stdin and writes stdout instead of drawing with curses, prints a JSON snapshot of the game state every turn, and accepts `#save`, `#load` and `#look` from the front end. Without `-j` it works exactly as before (`./play.sh`). One bug is fixed in both modes: ScottFree's random numbers only came in multiples of 4, so a 1% event in a game happened 4% of the time and a 10% event 12% of the time.
 - **Game knowledge.** `claudventure/scott.py` parses the `.dat` files and decodes the action table into rules such as `A64 CHOP TREE: IF Cypress tree is here AND carrying Rusty axe ... THEN ...`. The decoded guide and the walkthrough go into the narrator's system prompt. They are cached, so every turn after the first reads them cheaply.
 - **Narrator.** `claudventure/narrator.md` sets the rules: translate intent, not the solution; never invent facts; quote signs and clues exactly; stay inside the story; put hints in asides, graded.
 - **Isolation.** The Claude session runs with no tools, no MCP servers, none of your user settings and no `CLAUDE.md`, from an empty working directory. It can only talk.
@@ -153,11 +153,27 @@ Use `--model` or the `CLAUDVENTURE_MODEL` variable to change it, and `--effort` 
 | adv08 | Pyramid of Doom | quest2 | Questprobe 2: Spiderman |
 | adv09 | Ghost Town | sampler1 | Adventureland (sampler) |
 
-Only Adventureland has a written solution so far. For the other games, Claude works out its hints from the decoded game logic. To add a solution, write a command list in `claudventure/walkthroughs/<game>.txt` and check it on the real engine:
+Verified solutions, with how often they win on the real engine (the rest of the time the game's own random hazards strike, as the notes in each file explain):
+
+| Game | Wins | Game | Wins |
+|---|---|---|---|
+| sampler1 Adventureland (sampler) | 100% | adv07 Mystery Fun House | 100% |
+| adv01 Adventureland | 72% | adv08 Pyramid of Doom | 78% |
+| adv02 Pirate Adventure | 100% | adv09 Ghost Town | 100% |
+| adv03 Secret Mission | 89% | adv10 Savage Island, Part I | 73% |
+| adv04 Voodoo Castle | 100% | adv11 Savage Island, Part II | 100% |
+| adv05 The Count | 100% | adv12 The Golden Voyage | 50% |
+| adv06 Strange Odyssey | 69% | adv13 Sorcerer of Claymorgue Castle | 63% |
+
+Savage Island, Part I ends with a password for Part II: 474 with this solution, 123 if you also got the pirate's bandanna. Only 123 can win Part II, but the game does not check where the password came from.
+
+For the other games (adv14a, adv14b, quest1, quest2) Claude works out its hints from the decoded game logic. To add a solution, write a command list in `claudventure/walkthroughs/<game>.txt` and check it on the real engine:
 
 ```sh
-python3 claudventure/walkthrough.py games/adv02.dat claudventure/walkthroughs/adv02.txt --seeds 20
+python3 claudventure/walkthrough.py games/adv14a.dat claudventure/walkthroughs/adv14a.txt --seeds 100 --map
 ```
+
+A line is a game command; `? CMD` is needed only sometimes; `if here "X": CMD` runs only when X is in the room (also `carrying`, `said` for the last message, `not`, `and`), which handles random events; `# win: <text>` names the winning message of a game without treasures. `--map` draws the map of the places visited.
 
 ## Project layout
 
@@ -171,7 +187,7 @@ claudventure/
   engine.py                 drives the headless engine over pipes
   scott.py                  .dat reader and game-guide generator (python3 claudventure/scott.py guide games/adv01.dat)
   narrator.md               the narrator's rules (system prompt template)
-  walkthroughs/adv01.txt    verified Adventureland solution
+  walkthroughs/             verified solutions (13 games)
   walkthrough.py            plays a walkthrough on the real engine and reports the result
   tests/                    scripted sessions used to compare models
 src/                        ScottFree 1.14 with the headless patch

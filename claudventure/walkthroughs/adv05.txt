@@ -1,0 +1,269 @@
+# The Count - complete solution. Verified with
+#   python3 claudventure/walkthrough.py games/adv05.dat claudventure/walkthroughs/adv05.txt
+# win: carry me off cheering
+# Lines starting with '#' are notes. 'if here "X": CMD' means: do CMD only if
+# X is in the room ('carrying': carried; 'said': in the last message; 'not'
+# reverses it). The mail arrives at random times.
+# Each day lasts about 65 moves; at sunset you fall asleep and Dracula bites
+# you: the third bite turns you into a vampire. While you sleep he also steals
+# the stake unless it lies in the closet, behind the door you lock, and he
+# takes back his things. This solution wins on the third day.
+
+# DAY 1. The dumb-waiter in the kitchen goes up to the pantry and down to the
+# workroom (RAISE / LOWER, then GO ROOM)
+GET SHEET
+GET UP
+N
+W
+GO DUMB
+LOWER DUMB
+GO ROOM
+GET MALLET
+# The torch lies in the dark pit: tie the sheet to a ring to climb back out
+D
+TIE SHEET
+TO RING
+GO PIT
+GET TORCH
+CLIMB SHEET
+UNTIE SHEET
+U
+GO DUMB
+RAISE DUMB
+GO ROOM
+# After a while the postman rings (DING-DONG) and leaves a postcard outside
+E
+E
+if here "Postcard": GET POSTCARD
+if not carrying "Postcard": W
+if not carrying "Postcard" and not said "DING-DONG": LOOK
+if not carrying "Postcard" and not said "DING-DONG": LOOK
+if not carrying "Postcard" and not said "DING-DONG": LOOK
+if not carrying "Postcard" and not said "DING-DONG": LOOK
+if not carrying "Postcard" and not said "DING-DONG": LOOK
+if not carrying "Postcard" and not said "DING-DONG": LOOK
+if not carrying "Postcard" and not said "DING-DONG": LOOK
+if not carrying "Postcard" and not said "DING-DONG": LOOK
+if not carrying "Postcard" and not said "DING-DONG": LOOK
+if not carrying "Postcard" and not said "DING-DONG": LOOK
+if not carrying "Postcard" and not said "DING-DONG": LOOK
+if not carrying "Postcard" and not said "DING-DONG": LOOK
+if not carrying "Postcard" and not said "DING-DONG": LOOK
+if not carrying "Postcard" and not said "DING-DONG": LOOK
+if not carrying "Postcard" and not said "DING-DONG": LOOK
+if not carrying "Postcard" and not said "DING-DONG": LOOK
+if not carrying "Postcard" and not said "DING-DONG": LOOK
+if not carrying "Postcard" and not said "DING-DONG": LOOK
+if not carrying "Postcard" and not said "DING-DONG": LOOK
+if not carrying "Postcard" and not said "DING-DONG": LOOK
+if not carrying "Postcard" and not said "DING-DONG": LOOK
+if not carrying "Postcard" and not said "DING-DONG": LOOK
+if not carrying "Postcard" and not said "DING-DONG": LOOK
+if not carrying "Postcard" and not said "DING-DONG": LOOK
+if not carrying "Postcard" and not said "DING-DONG": LOOK
+if not carrying "Postcard": E
+if here "Postcard": GET POSTCARD
+UNCLIP POSTCARD
+W
+W
+GO DUMB
+LOWER DUMB
+GO ROOM
+# The paper clip picks the lock of the closet door
+PICK LOCK
+OPEN DOOR
+GO DOOR
+# The vial holds no-doz tablets: each keeps you awake for 40 moves
+EMPTY VIAL
+GET TABLETS
+# Leave the stake in the closet and lock the door: at night you are carried
+# through the closet, and only what lies there is safe
+DROP STAKE
+W
+CLOSE DOOR
+LOCK DOOR
+GO DUMB
+RAISE DUMB
+GO ROOM
+# Sleep (or wait for sunset): the first bite
+SLEEP
+# DAY 2. The garlic keeps the bats away at night
+GET UP
+N
+DROP MALLET
+DROP CLIP
+DROP POSTCARD
+DROP NOTE
+W
+GO DUMB
+RAISE DUMB
+GO ROOM
+GET GARLIC
+GET MATCHES
+GO DUMB
+LOWER DUMB
+GO ROOM
+E
+# The package arrives in the late afternoon. Take the first tablet now
+WAIT
+WAIT
+WAIT
+EAT TABLET
+if not said "DING-DONG": LOOK
+if not said "DING-DONG": LOOK
+if not said "DING-DONG": LOOK
+if not said "DING-DONG": LOOK
+if not said "DING-DONG": LOOK
+if not said "DING-DONG": LOOK
+if not said "DING-DONG": LOOK
+if not said "DING-DONG": LOOK
+if not said "DING-DONG": LOOK
+if not said "DING-DONG": LOOK
+if not said "DING-DONG": LOOK
+if not said "DING-DONG": LOOK
+if not said "DING-DONG": LOOK
+if not said "DING-DONG": LOOK
+if not said "DING-DONG": LOOK
+if not said "DING-DONG": LOOK
+if not said "DING-DONG": LOOK
+if not said "DING-DONG": LOOK
+if not said "DING-DONG": LOOK
+if not said "DING-DONG": LOOK
+if not said "DING-DONG": LOOK
+if not said "DING-DONG": LOOK
+if not said "DING-DONG": LOOK
+if not said "DING-DONG": LOOK
+if not said "DING-DONG": LOOK
+E
+GET PACKAGE
+OPEN PACKAGE
+# The bottle of blood, left by the bed, spares you one bite
+GET BOTTLE
+GET PACK
+W
+S
+GO BED
+DROP BOTTLE
+GET UP
+N
+W
+# The solar oven is too hot until sunset: inside is a nail file. Light the
+# torch for the night, but never carry it lit on the sheet
+GO OVEN
+if said "HEAT": GO OVEN
+if said "HEAT": GO OVEN
+if said "HEAT": GO OVEN
+if said "HEAT": GO OVEN
+if said "HEAT": GO OVEN
+if said "HEAT": GO OVEN
+if said "HEAT": GO OVEN
+if said "HEAT": GO OVEN
+if said "HEAT": GO OVEN
+if said "HEAT": GO OVEN
+if said "HEAT": GO OVEN
+if said "HEAT": GO OVEN
+if said "HEAT": GO OVEN
+if said "HEAT": GO OVEN
+if said "HEAT": GO OVEN
+if said "HEAT": GO OVEN
+if said "HEAT": GO OVEN
+if said "HEAT": GO OVEN
+if said "HEAT": GO OVEN
+if said "HEAT": GO OVEN
+if said "HEAT": GO OVEN
+if said "HEAT": GO OVEN
+if said "HEAT": GO OVEN
+if said "HEAT": GO OVEN
+if said "HEAT": GO OVEN
+if said "HEAT": GO OVEN
+if said "HEAT": GO OVEN
+if said "HEAT": GO OVEN
+if said "HEAT": GO OVEN
+if said "HEAT": GO OVEN
+LIGHT TORCH
+GET FILE
+W
+EAT TABLET
+DROP TABLETS
+E
+S
+GO BED
+GET SHEET
+GET UP
+# The sheet tied to the bed leads out of the window, down to the flower box
+# and through the dark window below
+TIE SHEET
+TO BED
+GET SHEET
+UNLIGHT TORCH
+OPEN WINDOW
+GO WINDOW
+DROP SHEET
+CLIMB SHEET
+GO WINDOW
+GO WINDOW
+LIGHT TORCH
+# Behind Dracula's portrait, a passage to the crypt
+GET PORTRAIT
+DROP PORTRAIT
+GO PASSAGE
+N
+# Smoke reveals the stone coffin ("a COUGHIN"); it vanishes when the
+# cigarette goes out. At night it opens: file through the bolt inside, and
+# take a second cigarette from the pack for tomorrow
+GET CIGARETTE
+LIGHT CIGARETTE
+SMOKE CIGARETTE
+OPEN COFFIN
+DROP CIGARETTE
+GO COFFIN
+WITH FILE
+GET CIGARETTE
+DROP FILE
+DROP PACK
+U
+UNLIGHT TORCH
+SLEEP
+# DAY 3: fetch the stake from the closet
+DROP GARLIC
+GET UP
+N
+GET MALLET
+GET CLIP
+W
+GO DUMB
+LOWER DUMB
+GO ROOM
+PICK LOCK
+OPEN DOOR
+GO DOOR
+GET STAKE
+DROP CLIP
+W
+GO DUMB
+RAISE DUMB
+GO ROOM
+E
+S
+GO BED
+GET SHEET
+GET UP
+TIE SHEET
+TO BED
+GET SHEET
+OPEN WINDOW
+GO WINDOW
+DROP SHEET
+CLIMB SHEET
+GO WINDOW
+GO WINDOW
+LIGHT TORCH
+GO PASSAGE
+N
+# By day, with the bolt broken, the coffin opens with Dracula inside
+LIGHT CIGARETTE
+if not here "Stone COFFIN": SMOKE CIGARETTE
+if here "Coffin is open": CLOSE COFFIN
+OPEN COFFIN
+GO COFFIN
+KILL DRACULA
