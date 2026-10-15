@@ -258,8 +258,9 @@ void *MemAlloc(int size)
 
 int RandomPercent(int n)
 {
-	unsigned int rv=rand()<<6;
-	rv%=100;
+	/* Was (rand()<<6)%100, which only gives multiples of 4: a 1% chance
+	   happened 4% of the time, 10% happened 12% */
+	unsigned int rv=(unsigned int)(rand()/((double)RAND_MAX+1.0)*100.0);
 	if(rv<n)
 		return(1);
 	return(0);
