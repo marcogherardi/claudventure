@@ -11,7 +11,9 @@ warnings are ignored); 'if here "X": CMD' runs CMD only when an item whose name
 contains X is in the room ('carrying "X"': carried, 'said "X"': in the last
 command's output). Conditions can be negated with 'not' and joined with 'and'
 ('if not carrying "Postcard" and not said "DING-DONG": LOOK'); 'unless C' is
-'if not C'. These handle the games' random events.
+'if not C'. 'until C: CMD, CMD' repeats the commands in turn until C holds
+(checked before each one), for random destinations. These handle the games'
+random events.
 """
 
 import re
@@ -27,12 +29,14 @@ WARN = ("dead", "can't do", "can't go", "sorry i can't", "beyond my power", "don
         "don't see", "won't let me", "won't fit", "something is missing")
 
 
-COND = re.compile(r'^(if|unless) (.+?):\s*([A-Z0-9].*)$', re.I)
+COND = re.compile(r'^(if|unless|until) (.+?):\s*([A-Z0-9].*)$', re.I)
 TEST = re.compile(r'^(not )?(here|carrying|said) "([^"]+)"$', re.I)
+MAX_ROUNDS = 100  # commands an 'until' line may send
 
 
 def commands(path):
-    """(command, optional, conditions) for each line; conditions: [(negated, kind, text)]."""
+    """(command, optional, conditions, loop) for each line; conditions: [(negated, kind,
+    text)]; loop is the list of commands of an 'until' line (its conditions say when to stop)."""
     for line in open(path):
         line = line.strip()
         if not line or line.startswith("#"):
@@ -42,11 +46,16 @@ def commands(path):
             tests = [TEST.match(t.strip()) for t in m.group(2).split(" and ")]
             if not all(tests):
                 raise ValueError(f"bad condition: {line}")
-            unless = m.group(1).lower() == "unless"
-            yield m.group(3).strip(), True, [(bool(t.group(1)) != unless, t.group(2).lower(),
-                                              t.group(3).lower()) for t in tests]
+            kind = m.group(1).lower()
+            conds = [(bool(t.group(1)) != (kind == "unless"), t.group(2).lower(), t.group(3).lower())
+                     for t in tests]
+            if kind == "until":
+                loop = [c.strip() for c in m.group(3).split(",")]
+                yield loop[0], True, conds, loop
+            else:
+                yield m.group(3).strip(), True, conds, None
         else:
-            yield line.lstrip("? ").strip(), line.startswith("?"), None
+            yield line.lstrip("? ").strip(), line.startswith("?"), None, None
 
 
 def holds(conds, state, last):
@@ -77,9 +86,9 @@ def run(game, walk, seed, verbose):
     won = False
     goal = win_text(walk)
     last = t.text
-    for n, (cmd, optional, cond) in enumerate(commands(walk), 1):
-        if cond and not holds(cond, t.state, last):
-            continue
+
+    def send(n, cmd, optional):
+        nonlocal t, last, won
         before = t.state.get("room")
         t = eng.send(cmd)
         amap.observe(t.state, cmd, before)
@@ -94,9 +103,20 @@ def run(game, walk, seed, verbose):
         hits = [w for w in WARN if w in out]
         if (hits and not optional) or t.state.get("unknown_word"):
             problems.append(f"{n}:{cmd}: {t.text.strip()[:80]!r}")
+        if t.state.get("game_over") and not won:
+            problems.append(f"{n}:{cmd}: game over: {' '.join(t.text.split())[-90:]!r}")
+
+    for n, (cmd, optional, cond, loop) in enumerate(commands(walk), 1):
+        if loop:
+            sent = 0
+            while not holds(cond, t.state, last) and sent < MAX_ROUNDS and not t.state.get("game_over"):
+                send(n, loop[sent % len(loop)], True)
+                sent += 1
+            if sent == MAX_ROUNDS:
+                problems.append(f"{n}:until: not reached after {sent} commands")
+        elif not cond or holds(cond, t.state, last):
+            send(n, cmd, optional)
         if t.state.get("game_over"):
-            if not won:
-                problems.append(f"{n}:{cmd}: game over: {' '.join(t.text.split())[-90:]!r}")
             break
     eng.close()
     return won, t.state, problems, amap

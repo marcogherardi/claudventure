@@ -90,6 +90,23 @@ class Game:
         """Whether any place can be dark: only then does the light source matter."""
         return any(56 in a.actions for a in self.actions)
 
+    @property
+    def has_lamp(self) -> bool:
+        """Whether a dark place can be lit: some games darken rooms but never
+        bring the light source item into play."""
+        if not self.has_darkness:
+            return False
+        if self.items[LIGHT_SOURCE].location != 0:
+            return True
+        for a in self.actions:
+            params = iter(v for c, v in a.conditions if c == 0)
+            for op in a.actions:
+                kinds = ACT.get(op, ("", ""))[1]
+                args = [next(params, None) for _ in kinds]
+                if op in (52, 53, 62, 72, 74, 75) and LIGHT_SOURCE in args:
+                    return True
+        return False
+
     # --- vocabulary, mirroring WhichWord() in ScottCurses.c ---------------
 
     def _match(self, word: str, entry: str) -> bool:
@@ -397,7 +414,7 @@ def guide(g: Game) -> str:
     w("- A direction alone (NORTH, N, ...) moves. Single letters n/s/e/w/u/d/i are accepted.")
     w("- Unknown verbs are rejected without using a turn. Any other command uses a turn.")
     w(f"- Carry limit: {g.max_carry} items. GET ALL / DROP ALL exist.")
-    if g.has_darkness and 0 < g.light_time < 5000:
+    if g.has_lamp and 0 < g.light_time < 5000:
         w(f"- The light source (item I{LIGHT_SOURCE}) lasts {g.light_time} turns once it is in play.")
     if g.treasures:
         w(f"- {g.treasures} treasures (items whose name starts with '*'). Store them in "

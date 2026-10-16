@@ -1,0 +1,237 @@
+# Questprobe 2: Spiderman - complete solution. Verified with
+#   python3 claudventure/walkthrough.py games/quest2.dat claudventure/walkthroughs/quest2.txt
+# Lines starting with '#' are notes. 'until C: A' means: repeat A until C.
+# Store the 18 gems in Madame Web's office (north of the hall where you
+# start); SCORE works from anywhere. Ask her to SCAN things for clues.
+# Dying is not the end: you wake in limbo and go down to the hall.
+# Nothing is left to chance: this solution always wins (Electro's random
+# bolts are dodged).
+
+# The sand in the small office west of the hall is the Sandman: he wakes if
+# you walk on him. Climb the ceiling first (you stay up there from room to
+# room). The crib holds a formula (only baby formula) and a gem
+GO CEILING
+W
+LOOK CRIB
+LOOK CRIB
+GET GEM
+E
+GO FLOOR
+# Force the elevator doors open and climb the shaft: each floor has a tool
+# niche with a gem. Push the elevator up from the third floor to reach the top
+E
+OPEN DOOR
+GO SHAFT
+LOOK NICHE
+GET GEM
+U
+LOOK NICHE
+GET GEM
+U
+LOOK NICHE
+GET GEM
+PUSH UP
+U
+LOOK NICHE
+GET GEM
+# The penthouse: a gem in the desk, a torn web formula behind J.J.
+# Jameson's portrait. Turning the thermostat down twice (to 31) freezes
+# Hydroman into an ice statue, and his aquarium with him
+W
+OPEN DESK
+GET GEM
+OPEN PAINTING
+GET PAPER
+LOWER THERMOSTAT
+LOWER THERMOSTAT
+# Web fluid needs the torn formula and the exotic chemicals, mixed in the
+# chemical lab: do not bring the acid along, or there are too many
+# ingredients. Acid and calcium carbonate make the calcium chloride that
+# turns the Lizard back into Doc Conners (M. Web: CaCO3+HCl=CaCl2)
+GO SHAFT
+D
+W
+W
+S
+GET CHEMICALS
+N
+N
+MIX WEB
+DROP PAPER
+S
+S
+GET ACID
+GET CALCIUM
+N
+N
+MIX CALCIUM
+GET CALCIUM
+# The Ringmaster's eyes order you out of the computer lab: go in with your
+# eyes closed, then push the knob and turn it
+S
+CLOSE EYES
+? W
+PUSH KNOB
+TURN KNOB
+OPEN EYES
+GET GEM
+E
+E
+GO SHAFT
+D
+D
+W
+W
+# The Lizard is in the office south of the hall
+S
+DROP CALCIUM
+LOOK CONNERS
+GET GEM
+GET CONNERS
+# The bio gem lies in the west office, with a Natter energy egg that
+# explodes, gem and all, once you go in: web the gem out from the hall
+N
+N
+SHOOT WEB
+AT GEM
+GET BIO
+E
+GET STATUE
+W
+N
+DROP ALL
+GET CONNERS
+GET STATUE
+# Printing a newspaper needs over 950 pounds of paper on the paper room's
+# scale: Doc Conners, the ice statue, the desk, the couch, and Doctor
+# Octopus and Electro stunned. The way is long: west of the second floor's
+# waiting room to the side of the skyscraper, into the sky (two offices with gems to the north and
+# south), up to an office ceiling and into its air duct
+S
+S
+E
+GO SHAFT
+U
+U
+U
+W
+GET DESK
+GET COUCH
+GO SHAFT
+D
+D
+W
+W
+GO SKY
+FEEL NORTH
+GET GEM
+S
+FEEL SOUTH
+GET GEM
+N
+GO CEILING
+OPEN MESH
+DROP MESH
+GO SHAFT
+# Web the fan five times to slow it, then web the button beyond it
+LOOK FAN
+SHOOT WEB
+AT FAN
+SHOOT WEB
+AT FAN
+SHOOT WEB
+AT FAN
+SHOOT WEB
+AT FAN
+SHOOT WEB
+AT FAN
+SHOOT WEB
+AT BUTTON
+GET GEM
+# The maze of ducts: down five times to the basement, and from there up four
+# times and north back to the hall
+GO FAN
+GET GEM
+D
+D
+D
+D
+D
+# In the basement, Electro's bolts kill you after your spider sense tingles,
+# unless you jump. Grab one of Doctor Octopus's arms and hit Electro: his
+# bolt stuns the Doctor, and you stun Electro
+until not said "towards": JUMP
+GET DOCTOR
+HIT ELECTRO
+LOOK DOCTOR
+GET GEM
+LOOK ELECTRO
+GET GEM
+GET DOCTOR
+GET ELECTRO
+W
+DROP DESK
+DROP COUCH
+DROP CONNERS
+DROP STATUE
+DROP DOCTOR
+DROP ELECTRO
+GET GEM
+LOOK DIAL
+E
+U
+U
+U
+U
+N
+N
+N
+DROP ALL
+# Turning the thermostat up thaws Hydroman (in the paper room, where he
+# still weighs enough) and his aquarium, which hides a gem. The computer
+# prints the newspaper in the basement
+S
+S
+E
+GO SHAFT
+U
+U
+U
+W
+RAISE THERMOSTAT
+GO SHAFT
+D
+W
+W
+W
+TYPE RUN
+E
+E
+GO SHAFT
+D
+W
+W
+GO CEILING
+GO SHAFT
+GO FAN
+D
+D
+D
+D
+D
+GET NEWSPAPER
+OPEN NEWSPAPER
+GET GEM
+U
+U
+U
+U
+N
+N
+E
+EMPTY AQUARIUM
+GET GEM
+W
+N
+DROP ALL
+SCORE

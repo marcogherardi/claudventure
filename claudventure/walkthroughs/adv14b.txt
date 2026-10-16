@@ -1,0 +1,208 @@
+# Buckaroo Banzai - complete solution. Verified with
+#   python3 claudventure/walkthrough.py games/adv14b.dat claudventure/walkthroughs/adv14b.txt
+# win: The earth is safe again
+# Lines starting with '#' are notes. There are no treasures: an atomic bomb is
+# hidden inside the mountain, and you win by radioing it the disarm code,
+# first WARFIN, then YOYODYNE, from the shed full of radio equipment.
+# The bomb goes off after 750 moves (this solution takes 167). Never take the
+# freeway south of the highway ramp: the bomb then goes off two moves later.
+# SLEEP is fatal too. You can carry only 5 things.
+# Nothing is left to chance: this solution always wins.
+
+# Under the table in the office lies a floor safe (its key comes later)
+PUSH TABLE
+# The toolbox in the garage of the house at the east cul-de-sac holds a key,
+# duct tape and a flashlight. The flashlight lasts only 35 turns: light it
+# only in the dark basement and in the cavern
+W
+E
+E
+GO HOUSE
+GET TOOLBOX
+OPEN TOOLBOX
+DROP TOOLBOX
+S
+W
+W
+GO BUILDING
+# Under the basement stairs: an empty chemical jug
+GO STAIRS
+LIGHT FLASHLIGHT
+LOOK STAIRS
+UNLIGHT FLASHLIGHT
+DROP FLASHLIGHT
+GO STAIRS
+W
+N
+# The jet car needs jet fuel, made from gasoline. The station's tank is
+# underground: the hand pump's hose is too short, so tape on the car's fuel
+# hose. The glove compartment holds the fuel formula and a jar of catalyst
+GO HARDWARE
+GET PUMP
+E
+N
+W
+GET HOSE
+CONNECT HOSE
+DROP TAPE
+GO CAR
+OPEN GLOVE
+GET OUT
+E
+S
+S
+GO STATION
+# The toolbox key opens the padlocked filler pipe. Then take the hose back.
+# An old car battery is under the trash in the cashier's booth
+OPEN PIPE
+PUT HOSE
+PUMP GAS
+UNCONNECT HOSE
+DROP PUMP
+DROP KEY
+GO BOOTH
+LOOK PILE
+GET BATTERY
+N
+E
+GO BUILDING
+# Leave the fuel ingredients in the basement, where the vat is
+GO STAIRS
+DROP JUG
+DROP FORMULA
+DROP JAR
+GO STAIRS
+W
+N
+# Gasoline left residue in the hose: wash it in the lake (where the
+# battery gets its water too) before putting it back on the car, or the car
+# blows up when started. Sand is on the beach
+N
+W
+N
+GET SAND
+N
+WASH HOSE
+FUEL BATTERY
+E
+S
+W
+REPLACE HOSE
+E
+# Quartz is embedded in a ledge on the mountain: a climber's pick digs it
+# out, and a phone line, dug up in the field and cut at both ends, lets you
+# climb (tie it to the pick, then climb with empty hands)
+S
+GO HARDWARE
+GET PICK
+GET CABLES
+E
+S
+S
+E
+DIG
+CUT LINE
+DIG
+CUT LINE
+GET LINE
+W
+N
+N
+N
+N
+THROW LINE
+TIE LINE
+TO PICK
+DROP ALL
+CLIMB LINE
+GET LINE
+GET QUARTZ
+DROP LINE
+DROP PICK
+D
+GET SAND
+GET BATTERY
+GET CABLES
+S
+# The battery is dead: jumper cables from the car's terminals to the
+# battery charge it while the engine idles
+W
+CONNECT CABLES
+TO TERMINALS
+CONNECT CABLES
+TO BATTERY
+E
+S
+S
+GO BUILDING
+# The fuel needs the flashlight lit, the formula, gasoline, sand, quartz
+# and the catalyst
+GO STAIRS
+DROP SAND
+DROP QUARTZ
+LIGHT FLASHLIGHT
+MAKE FUEL
+UNLIGHT FLASHLIGHT
+GET FLASHLIGHT
+GO STAIRS
+W
+N
+N
+W
+FUEL CAR
+# Start the engine with the cockpit open: it only idles
+DROP JUG
+GO CAR
+PUSH BUTTON
+GET OUT
+GET BATTERY
+# The ham radio in the lifeguard shack takes the charged battery and, in
+# the shed on Hickory Ave, the antenna. Don't pick the radio up again: that
+# disconnects the antenna
+N
+GO SHACK
+GET RADIO
+CONNECT BATTERY
+LOOK RADIO
+E
+S
+E
+S
+S
+W
+GO SHED
+CONNECT ANTENNA
+N
+# With the cockpit closed the car drives to Main St, then into the mountain
+E
+N
+N
+W
+GO CAR
+CLOSE COCKPIT
+PUSH BUTTON
+PUSH BUTTON
+OPEN COCKPIT
+GET OUT
+LIGHT FLASHLIGHT
+# The bomb's RFI shield blocks the radio: switch it off. The envelope holds
+# the key of the office safe, and the safe the disarm code. The mine shaft's
+# stone door leads out, but never back in
+LOOK BOMB
+PUSH SWITCH
+GET ENVELOPE
+OPEN ENVELOPE
+N
+PUSH DOOR
+UNLIGHT FLASHLIGHT
+E
+S
+GO BUILDING
+OPEN SAFE
+LOOK PAPER
+W
+W
+GO SHED
+# The bomb counts down aloud now
+TRANSMIT WARFIN
+TRANSMIT YOYODYNE

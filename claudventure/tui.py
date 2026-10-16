@@ -316,7 +316,7 @@ class Claudventure(App):
         if st["treasures_total"]:
             score.append(f"Treasures {st['treasures_stored']}/{st['treasures_total']}")
         score.append(f"Turn {st['turn']}")
-        if g.has_darkness:
+        if g.has_lamp:
             score.append("Light on" if st["lamp_lit"] else "No light")
         self.query_one("#score", Static).update(" · ".join(score))
 

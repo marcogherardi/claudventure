@@ -60,7 +60,7 @@ from, and about how heavy you are right now.
 - **Undo, save, load.** `/undo` takes back your last message, even after a fatal mistake. `/save` and `/load` keep named saves, and quitting saves automatically.
 - **Token and quota meter.** The status line shows the tokens used and your Claude subscription quota (5-hour and weekly windows). `/usage` gives the breakdown.
 - **All 18 games.** Each game file is decoded into a complete guide for the narrator: vocabulary with synonyms, map, items, and every rule of the game logic in readable form, including the original authors' comments.
-- **Verified solutions for 13 of the 18 games.** Each one is played to the end on the real engine over hundreds of random seeds; the narrator keeps it secret and uses it only for graded hints. Where a solution sometimes fails, it is because of the game's own random hazards, and the solution's notes say so (see [The games](#the-games)).
+- **Verified solutions for all 18 games.** Each one is played to the end on the real engine over hundreds of random seeds; the narrator keeps it secret and uses it only for graded hints. Where a solution sometimes fails, it is because of the game's own random hazards, and the solution's notes say so (see [The games](#the-games)).
 - **Plain game commands skip the interpretation step.** Typing `n`, `i`, `get axe` or `climb tree` sends the command straight to the engine, and Claude only narrates the outcome: one request instead of two. Use `--always-interpret` to let Claude interpret everything.
 - **No API key.** Claudventure drives Claude Code in non-interactive mode, so it runs on your Claude subscription.
 
@@ -157,23 +157,25 @@ Verified solutions, with how often they win on the real engine (the rest of the 
 
 | Game | Wins | Game | Wins |
 |---|---|---|---|
-| sampler1 Adventureland (sampler) | 100% | adv07 Mystery Fun House | 100% |
-| adv01 Adventureland | 72% | adv08 Pyramid of Doom | 78% |
-| adv02 Pirate Adventure | 100% | adv09 Ghost Town | 100% |
-| adv03 Secret Mission | 89% | adv10 Savage Island, Part I | 73% |
-| adv04 Voodoo Castle | 100% | adv11 Savage Island, Part II | 100% |
-| adv05 The Count | 100% | adv12 The Golden Voyage | 50% |
-| adv06 Strange Odyssey | 69% | adv13 Sorcerer of Claymorgue Castle | 63% |
+| sampler1 Adventureland (sampler) | 100% | adv09 Ghost Town | 100% |
+| adv01 Adventureland | 72% | adv10 Savage Island, Part I | 73% |
+| adv02 Pirate Adventure | 100% | adv11 Savage Island, Part II | 100% |
+| adv03 Secret Mission | 89% | adv12 The Golden Voyage | 50% |
+| adv04 Voodoo Castle | 100% | adv13 Sorcerer of Claymorgue Castle | 63% |
+| adv05 The Count | 100% | adv14a Return to Pirate's Isle | 100% |
+| adv06 Strange Odyssey | 69% | adv14b Buckaroo Banzai | 100% |
+| adv07 Mystery Fun House | 100% | quest1 Questprobe 1: The Hulk | 100% |
+| adv08 Pyramid of Doom | 78% | quest2 Questprobe 2: Spiderman | 100% |
 
 Savage Island, Part I ends with a password for Part II: 474 with this solution, 123 if you also got the pirate's bandanna. Only 123 can win Part II, but the game does not check where the password came from.
 
-For the other games (adv14a, adv14b, quest1, quest2) Claude works out its hints from the decoded game logic. To add a solution, write a command list in `claudventure/walkthroughs/<game>.txt` and check it on the real engine:
+To change a solution, edit its command list in `claudventure/walkthroughs/<game>.txt` and check it again on the real engine:
 
 ```sh
-python3 claudventure/walkthrough.py games/adv14a.dat claudventure/walkthroughs/adv14a.txt --seeds 100 --map
+python3 claudventure/walkthrough.py games/quest1.dat claudventure/walkthroughs/quest1.txt --seeds 100 --map
 ```
 
-A line is a game command; `? CMD` is needed only sometimes; `if here "X": CMD` runs only when X is in the room (also `carrying`, `said` for the last message, `not`, `and`), which handles random events; `# win: <text>` names the winning message of a game without treasures. `--map` draws the map of the places visited.
+A line is a game command; `? CMD` is needed only sometimes; `if here "X": CMD` runs only when X is in the room (also `carrying`, `said` for the last message, `not`, `and`), which handles random events; `until C: CMD, CMD` repeats the commands in turn until C holds, for random destinations; `# win: <text>` names the winning message of a game without treasures. `--map` draws the map of the places visited.
 
 ## Project layout
 

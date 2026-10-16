@@ -399,7 +399,8 @@ class Session:
                            "require small detours. Lines starting with # are notes; '? CMD' is only "
                            "needed in some cases; 'if here \"X\": CMD' (or 'if carrying', 'if said', "
                            "'unless ...') is done only when X is in the room, carried, or in the "
-                           "last message (or, for unless, when it is not).\n\n"
+                           "last message (or, for unless, when it is not); 'until C: A, B' repeats "
+                           "A and B in turn until C holds (for random destinations).\n\n"
                            + walk_path.read_text())
         else:
             walkthrough = ("# Solution\n\nNo verified walkthrough is available for this game: work "
@@ -434,7 +435,7 @@ class Session:
         lines.append("Carrying: " + (", ".join(st["inventory"]) or "nothing")
                      + f" ({len(st['inventory'])}/{g.max_carry})")
         light = (f"; light on, {st['light_time']} turns of light left" if st["lamp_lit"]
-                 else "; no lit light source") if g.has_darkness else ""
+                 else "; no lit light source") if g.has_lamp else ""
         lines.append(f"Turn {st['turn']}{light}")
         if st["treasures_total"]:
             lines.append(f"Treasures stored: {st['treasures_stored']} of {st['treasures_total']}")

@@ -1,0 +1,162 @@
+# Questprobe 1: The Hulk - complete solution. Verified with
+#   python3 claudventure/walkthrough.py games/quest1.dat claudventure/walkthroughs/quest1.txt
+# Lines starting with '#' are notes. 'until C: A, B' means: repeat A and B in
+# turn until C. Store the 17 gems in the fuzzy area; SCORE works from anywhere.
+# Pain turns Bruce Banner into the Hulk (BITE TONGUE). A gas in the domes and
+# tunnels turns the Hulk back at once, unless he is very mad: REMEMBER
+# NIGHTMARE makes him madder, but too mad and he rampages off to the fuzzy
+# area. The fields outside have high gravity: there only the Hulk survives,
+# and stays the Hulk.
+# Dying is not the end here: you wake in limbo and go down to the first dome.
+# The fields' exits all lead into a warp, to the fuzzy area; leaving the fuzzy
+# area S, E or W warps you to a random field (once, to the Chief Examiner).
+# Nothing is left to chance: this solution always wins.
+
+# Tied to a chair: the pain makes the Hulk break the rope, then the gas
+# makes Banner again
+BITE TONGUE
+GET GEM
+GET FAN
+E
+# The button in the tunnel turns on a delay: change in a tunnel and the
+# Hulk lasts a moment. Lift the ring in the dome to open a way back up from
+# the small room below
+PUSH BUTTON
+BITE TONGUE
+REMEMBER NIGHTMARE
+W
+LIFT RING
+E
+# Out into the field as the Hulk. Gems are under the domes and down holes
+# you dig (dig in the hole until a gem shows up: dig too long and you hit the
+# molten core)
+BITE TONGUE
+GO DOME
+GET GEM
+LIFT DOME
+GET GEM
+DIG
+GO HOLE
+DIG
+GET GEM
+U
+N
+DROP GEM
+DROP GEM
+DROP GEM
+# The small underground room (north of the fuzzy area) is full of poison
+# gas for Banner. The energy egg there explodes on the second turn: the Hulk
+# eats it first. The wall's scratch marks hide a crack to a cavern, where
+# ULTRON holds Ant-Man in a cage. Leave the living bio gem here for now:
+# taken anywhere it is not with you, it soon wanders off
+REMEMBER NIGHTMARE
+N
+BITE EGG
+SCRATCH WALL
+GO CRACK
+GET GEM
+GO CRACK
+GO HOLE
+E
+BITE TONGUE
+GO DOME
+N
+DROP GEM
+DROP GEM
+# The warp: try until you meet the Chief Examiner, who has a gem in his desk
+until here "Door": S, N
+LOOK DESK
+GET GEM
+OPEN DOOR
+DROP GEM
+# Then until you land in the field with the wire mesh dome (no holes there
+# yet). Blow the killer bees out of the dome with the fan, then go in for
+# their wax
+until here "Large dome" and not here "hole": S, N
+GET GEM
+LIFT DOME
+GET GEM
+WAVE FAN
+AT MESH
+DIG
+GO HOLE
+DIG
+DIG
+DIG
+DIG
+DIG
+DIG
+DIG
+GET GEM
+U
+GO DOME
+W
+GET WAX
+E
+BITE TONGUE
+GO DOME
+N
+DROP GEM
+DROP GEM
+DROP GEM
+# Now until the field with the tiny holes. Army ants swarm from them: leave
+# at once, into the dome. Wax plugs the gas outlet behind the baseboard, so
+# the Hulk can stay to meet Dr. Strange's astral projection (say his name
+# three times)
+until here "Tiny holes": S, N
+GO DOME
+GET GEM
+W
+GET GEM
+LOOK BASEBOARD
+PLUG HOLE
+USE WAX
+BITE TONGUE
+SAY DR
+SAY DR
+SAY DR
+GET GEM
+UNPLUG HOLE
+# The ants attack your eyes, nose and ears: close them all (wax in the
+# ears) and be the Hulk. Then carry the ants to Ant-Man
+E
+PLUG EARS
+USE WAX
+HOLD NOSE
+BITE TONGUE
+GO DOME
+CLOSE EYES
+GET GEM
+LIFT DOME
+GET GEM
+DIG
+GO HOLE
+DIG
+DIG
+DIG
+DIG
+GET GEM
+? U
+GET ANTS
+? N
+DROP GEM
+DROP GEM
+DROP GEM
+DROP GEM
+DROP GEM
+DROP GEM
+REMEMBER NIGHTMARE
+? N
+GO CRACK
+GET GEM
+OPEN EYES
+# Last, the bio gem, carried all the way to the fuzzy area
+GO CRACK
+GET BIO
+GO HOLE
+E
+BITE TONGUE
+GO DOME
+N
+DROP ALL
+SCORE

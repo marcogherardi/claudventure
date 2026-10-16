@@ -6,8 +6,9 @@ geometric: passages that do not fit the grid, loops and magic transports are
 listed under the map instead of drawn.
 """
 
+import heapq
+import itertools
 import re
-from collections import deque
 from typing import Dict, List, Optional, Tuple
 
 import scott
@@ -25,6 +26,7 @@ class AutoMap:
         self.seen: Dict[int, bool] = {}            # room -> seen in the light
         self.items: Dict[int, List[str]] = {}      # room -> items seen there last time
         self.links: List[Tuple[int, str, int]] = []  # moves not explained by exits
+        self.tried: set = set()  # (room, direction) taken that led somewhere else (a warp)
 
     # recording -----------------------------------------------------------------
 
@@ -41,8 +43,10 @@ class AutoMap:
             self.items[room] = list(state.get("items_here", []))
         if cmd and before is not None and before != room and room != len(self.game.rooms) - 1:
             vb, no, _ = self.game.parse_command(cmd)
-            regular = vb == 1 and no is not None and 1 <= no <= 6 and \
-                self.game.rooms[before].exits[no - 1] == room
+            step = vb == 1 and no is not None and 1 <= no <= 6
+            regular = step and self.game.rooms[before].exits[no - 1] == room
+            if step and not regular and self.game.rooms[before].exits[no - 1]:
+                self.tried.add((before, no - 1))
             link = (before, cmd, room)
             if not regular and link not in self.links:
                 self.links.append(link)
@@ -50,7 +54,7 @@ class AutoMap:
     def to_json(self) -> dict:
         return {"order": self.order, "seen": {str(k): v for k, v in self.seen.items()},
                 "items": {str(k): v for k, v in self.items.items()},
-                "links": [list(l) for l in self.links]}
+                "links": [list(l) for l in self.links], "tried": [list(t) for t in self.tried]}
 
     @classmethod
     def from_json(cls, game: scott.Game, data: dict) -> "AutoMap":
@@ -59,6 +63,7 @@ class AutoMap:
         m.seen = {int(k): v for k, v in data.get("seen", {}).items()}
         m.items = {int(k): v for k, v in data.get("items", {}).items()}
         m.links = [tuple(l) for l in data.get("links", [])]
+        m.tried = {tuple(t) for t in data.get("tried", [])}
         return m
 
     # layout ----------------------------------------------------------------------
@@ -86,24 +91,32 @@ class AutoMap:
             pos[room] = cell
             taken[cell] = room
 
-        place(start, (0, 0, 0))
-        queue = deque([start])
-        while queue:
-            r = queue.popleft()
-            x, y, z = pos[r]
+        # Rooms are placed nearest first, a two-way passage counting as one step and an
+        # exit that only goes one way (a maze's) as three, so that such an exit does not
+        # take a real neighbour's place
+        frontier: List[Tuple[int, int, int, int, int]] = []  # (distance, seq, room, from, d)
+        seq = itertools.count()
+
+        def reach(r, dist):
             for d in range(6):
-                targets = []
                 t = self._exits(r)[d]
                 if t in free and t not in pos:
-                    targets.append(t)
+                    step = 1 if self._exits(t)[OPPOSITE[d]] == r else 3
+                    heapq.heappush(frontier, (dist + step, next(seq), t, r, d))
                 for other in free:  # rooms whose exits lead here
-                    if other not in pos and self._exits(other)[OPPOSITE[d]] == r:
-                        targets.append(other)
-                for room in targets:
-                    if room not in pos:
-                        dx, dy, dz = DELTA[d]
-                        place(room, (x + dx, y + dy, z + dz))
-                        queue.append(room)
+                    if other not in pos and other != t and self._exits(other)[OPPOSITE[d]] == r:
+                        heapq.heappush(frontier, (dist + 3, next(seq), other, r, d))
+
+        place(start, (0, 0, 0))
+        reach(start, 0)
+        while frontier:
+            dist, _, room, r, d = heapq.heappop(frontier)
+            if room in pos:
+                continue
+            x, y, z = pos[r]
+            dx, dy, dz = DELTA[d]
+            place(room, (x + dx, y + dy, z + dz))
+            reach(room, dist)
         return pos
 
     def _layout(self) -> Dict[int, Tuple[int, int, int]]:
@@ -220,7 +233,8 @@ class AutoMap:
                 line += "  —  " + ", ".join(" ".join(i.split()) for i in self.items[r])
             notes = []
             ex = self._exits(r)
-            unexplored = [SHORT[d] for d in range(6) if ex[d] and ex[d] not in pos]
+            unexplored = [SHORT[d] for d in range(6)
+                          if ex[d] and ex[d] not in pos and (r, d) not in self.tried]
             loops = [SHORT[d] for d in range(6) if ex[d] == r]
             odd = [f"{SHORT[d]}→{num[ex[d]]}" for d in range(6)
                    if ex[d] and ex[d] != r and ex[d] in pos and (r, d) not in drawn]

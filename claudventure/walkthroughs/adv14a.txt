@@ -1,0 +1,211 @@
+# Return to Pirate's Isle - complete solution. Verified with
+#   python3 claudventure/walkthrough.py games/adv14a.dat claudventure/walkthroughs/adv14a.txt
+# Lines starting with '#' are notes. Store the 13 treasures in the smugglers'
+# hold, a secret room in your own ship's hull reached only from under water,
+# and say SCORE there: SCORE counts only while the hold's sign ("Leave
+# *TREASURES* here") lies in the hold too.
+# You are near-sighted: without glasses (or the face mask with their lenses)
+# everything is too FUZZY, and nothing can be LOOKed at.
+# Moving "in the dark" here is safe through exits you know; walking into a
+# wall in the dark breaks your neck.
+# Nothing is left to chance: this solution always wins.
+
+# Wake up in the bunk, feel for the glasses in the cabin
+GET UP
+FEEL GLASSES
+WEAR GLASSES
+MOVE BUNK
+# A button in the ceiling switches the floodlights; they drain the battery,
+# and when it is down to 6 amps the ceiling fan stops (brooch, fan blade).
+# Switch them off before the battery is flat, or the engine won't start
+LOOK CEILING
+MOVE BUTTON
+LOOK BATTERY
+GO TOP
+GET MASK
+GET WATCH
+D
+D
+GO ENGINE
+LOOK ENGINE
+D
+U
+# The painting of Blackbeard hides a map on its back and a Rembrandt beneath
+GET PAINTING
+REMOVE FRAME
+LOOK PAINTING
+LOOK PAINTING
+LOOK BATTERY
+LOOK FAN
+REMOVE BLADE
+LOOK BATTERY
+MOVE BUTTON
+DROP FRAME
+# Only empty hands fit through the porthole (the glasses slip off). The
+# oilskin raincoat on the catwalk outside keeps the Rembrandt dry: any
+# painting carried into the sea unwrapped is ruined
+OPEN PORTHOLE
+DROP ALL
+GO PORTHOLE
+GET OILSKIN
+GO SEA
+GO SHIP
+? D
+FEEL GLASSES
+WEAR GLASSES
+GET PAINTING
+ROLL PAINTING
+TO OILSKIN
+DROP PAINTING
+GET MASK
+GET SCREWDRIVER
+GET BLADE
+U
+GO DOCK
+N
+# Dig with the fan blade for the rum; the sleeping pirate has a box and an
+# earring on him, and sails your ship only once he gets his rum. The tool
+# shed (hammer) is through the crack on the hilltop
+DIG
+DROP BLADE
+GO HILL
+JUMP UP
+LOOK PIRATE
+LOOK PIRATE
+GO CRACK
+GO SHED
+GET HAMMER
+? N
+GO CRACK
+DROP RUM
+WAKE PIRATE
+JUMP LEDGE
+D
+E
+# Under water you need the mask, and to see through it, the lenses of your
+# glasses. The pumice rock carries the algae (Funori, as the booklet under
+# the mattress explains) that make glue, with amber inside. Spit in the mask
+# first, or it fogs up
+GET ROCK
+LOOK ROCK
+LOOK ALGAE
+MAKE GLUE
+SPIT MASK
+REMOVE LENSES
+GLUE LENSES
+TO MASK
+WEAR MASK
+DROP WIRE
+DROP ROCK
+# Take a breath before diving (GET BREATH; BREATHE again under water and you
+# drown). Feel the silt only once in each place: a second time stirs it up
+GO SEA
+GET BREATH
+SWIM DOWN
+FEEL SILT
+SWIM UP
+GO BEACH
+W
+S
+GO SHIP
+D
+GET PAINTING
+U
+# Under your own ship: an oyster in the silt, and a hull you can feel open
+GO SEA
+GET BREATH
+SWIM DOWN
+SWIM WEST
+FEEL SILT
+LOOK SHIP
+FEEL SHIP
+SWIM OPENING
+GO SHIP
+# The smugglers' hold. The stamps and the rare book would be lost in the sea:
+# carry them in the box and in the chest, and open those here (the box with
+# the hammer)
+DROP DOUBLOONS
+DROP AMBER
+DROP EARRING
+OPEN BOX
+DROP BOX
+UNROLL PAINTING
+DROP PAINTING
+DROP OILSKIN
+# The hold's sign is through the narrow crawlway: empty hands again
+REMOVE MASK
+DROP ALL
+GO CRAWLWAY
+? E
+GET SIGN
+? W
+? W
+DROP SIGN
+GET MASK
+WEAR MASK
+# A live snail (Oyster Drill) opens the oyster for its pearl; snails die out
+# of the sea. The snail is on the pilings under the dock
+GET OYSTER
+GO SEA
+GET BREATH
+SWIM DOWN
+SWIM EAST
+SWIM UP
+GO SHIP
+GO DOCK
+GO SEA
+GET BREATH
+SWIM DOWN
+SWIM EAST
+LOOK PILINGS
+OPEN OYSTER
+USE SNAIL
+DROP SNAIL
+DROP OYSTER
+SWIM UP
+GO DOCK
+GET DOLLAR
+LOOK DOCK
+D
+GET BREATH
+SWIM DOWN
+SWIM WEST
+SWIM UP
+GO DOCK
+GO SHIP
+D
+GET WATCH
+GET BROOCH
+GET RING
+# Sailing needs the map, the pirate at the helm and the engine running. The
+# trip burns 15 of the 40 liters of gas (and night falls): stop the engine
+# after. Out at sea, the sunken ship lies by your boat
+GET MAP
+D
+START ENGINE
+U
+SAIL SHIP
+? D
+STOP ENGINE
+LOOK GAS
+? U
+? U
+GO SEA
+GET BREATH
+SWIM DOWN
+GO SHIP
+GET CHEST
+? U
+SWIM WEST
+SWIM OPENING
+GO SHIP
+DROP CHEST
+OPEN CHEST
+DROP BOOK
+DROP WATCH
+DROP BROOCH
+DROP RING
+DROP DOLLAR
+DROP PEARL
+DROP PIN
+SCORE
